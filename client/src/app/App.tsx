@@ -1,5 +1,10 @@
-function App() {
-  return  <h1>Hello kanban</h1>
-}
+import { AppProviders } from "@/app/providers";
+import { AppRouter } from "@/app/providers/router/router";
 
-export default App
+export function App() {
+  return (
+    <AppProviders>
+      <AppRouter />
+    </AppProviders>
+  );
+}

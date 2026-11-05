@@ -316,7 +316,7 @@ export interface ChatMessage {
 }
 
 export interface ChatRequest {
-  messages: ChatMessage[]; // 1–30 messages, must end with a "user" message
+  messages: ChatMessage[]; // Must end with a "user" message
 }
 
 export interface ChatResponse {

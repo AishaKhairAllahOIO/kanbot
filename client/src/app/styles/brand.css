@@ -1,0 +1,24 @@
+:root {
+  --brand: #4f46e5;
+  --on-brand: #ffffff;
+  --brand-hover: color-mix(in oklab, var(--brand) 88%, #000);
+  --brand-active: color-mix(in oklab, var(--brand) 78%, #000);
+  --brand-ink: color-mix(in oklab, var(--brand) 88%, #000);
+  --brand-soft: color-mix(in oklab, var(--brand) 9%, var(--surface));
+  --brand-soft-border: color-mix(in oklab, var(--brand) 28%, var(--surface));
+  --focus: var(--brand);
+
+  --signal: #22c55e;
+  --signal-ink: var(--success);
+}
+
+:root[data-theme='dark'] {
+  --brand: #8b8ff8;
+  --on-brand: var(--canvas);
+  --brand-hover: color-mix(in oklab, var(--brand) 88%, #fff);
+  --brand-active: color-mix(in oklab, var(--brand) 76%, #fff);
+  --brand-ink: var(--brand);
+  --brand-soft: color-mix(in oklab, var(--brand) 14%, var(--surface));
+
+  --signal: var(--success);
+}

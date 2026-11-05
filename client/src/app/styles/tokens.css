@@ -1,0 +1,129 @@
+/* ==========================================================================
+   Base tokens: light (default)
+   Rule: a color that equals another token is an alias, never a copied hex.
+   ========================================================================== */
+:root {
+  color-scheme: light;
+
+  /* Surfaces & text */
+  --canvas: #f5f6f8;
+  --surface: #ffffff;
+  --surface-sunken: #eceef2;
+  --surface-raised: #ffffff;
+  --border: #dde1e8;
+  --border-strong: #c3c9d4;
+  --text: #171b26;
+  --text-muted: #566074;
+  --text-subtle: #6b7385;
+  --overlay: rgb(23 27 38 / 0.45);
+
+  /* Semantic */
+  --danger: #b91c1c;
+  --warning: #fbbf24;
+  --success: #15803d;
+  --info: #0369a1;
+  --star: var(--warning);
+
+  /* Status */
+  --status-todo: #5b6780;
+  --status-in-progress: var(--info);
+  --status-in-review: #b45309;
+  --status-done: var(--success);
+
+  /* Priority */
+  --priority-low: var(--text-subtle);
+  --priority-medium: var(--text);
+  --priority-high: #c2410c;
+  --priority-urgent: var(--danger);
+
+  /* Issue type */
+  --type-task: #4b5c7a;
+  --type-story: #0f766e;
+  --type-bug: #a21caf;
+
+  /* Labels */
+  --label-blue: #2563eb;
+  --label-indigo: #4f46e5;
+  --label-purple: #9333ea;
+  --label-pink: #db2777;
+  --label-rose: #e11d48;
+  --label-orange: #ea580c;
+  --label-amber: #d97706;
+  --label-emerald: #059669;
+  --label-teal: #0d9488;
+  --label-cyan: #0891b2;
+
+  /* Elevation */
+  --elevation-card: 0 1px 2px color-mix(in srgb, var(--text) 5%, transparent);
+  --elevation-pop: 0 4px 12px color-mix(in srgb, var(--text) 8%, transparent), 0 0 0 1px var(--border);
+  --elevation-modal: 0 10px 24px color-mix(in srgb, var(--text) 12%, transparent), 0 0 0 1px var(--border);
+
+  /* Motion */
+  --dur-fast: 120ms;
+  --dur-base: 180ms;
+  --dur-slow: 280ms;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+
+  /* Layout */
+  --topbar-height: 4rem;
+  --bottom-nav-height: 4rem;
+  --sidebar-width: 14.5rem;
+  --sidebar-section-indent: 1.125rem;
+  --board-column-min: 17.5rem;
+
+  /* Stacking */
+  --z-sticky: 10;
+  --z-drawer: 30;
+  --z-dialog: 40;
+  --z-popover: 50;
+  --z-toast: 60;
+  --z-drag-overlay: 70;
+}
+
+/* ==========================================================================
+   Dark: only what actually differs from light.
+   Aliases (--star, --status-done, --priority-urgent, ...) follow automatically.
+   ========================================================================== */
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --canvas: #0f1219;
+  --surface: #171b25;
+  --surface-sunken: #0b0e14;
+  --surface-raised: #1e2330;
+  --border: #2a3040;
+  --border-strong: #3a4257;
+  --text: #e8ebf2;
+  --text-muted: #a3acbf;
+  --text-subtle: #8089a0;
+  --overlay: rgb(0 0 0 / 0.6);
+
+  --danger: #f87171;
+  --success: #4ade80;
+  --info: #38bdf8;
+
+  --status-todo: #9aa5bd;
+  --status-in-review: var(--warning);
+
+  --priority-medium: #c5ccdb;
+  --priority-high: #fb923c;
+
+  --type-task: #9aa5bd;
+  --type-story: #2dd4bf;
+  --type-bug: #e879f9;
+
+  --label-blue: #93c5fd;
+  --label-indigo: #a5b4fc;
+  --label-purple: #d8b4fe;
+  --label-pink: #f9a8d4;
+  --label-rose: #fda4af;
+  --label-orange: #fdba74;
+  --label-amber: #fcd34d;
+  --label-emerald: #6ee7b7;
+  --label-teal: #5eead4;
+  --label-cyan: #67e8f9;
+
+  --elevation-card: 0 1px 2px rgb(0 0 0 / 0.18);
+  --elevation-pop: 0 6px 16px rgb(0 0 0 / 0.3);
+  --elevation-modal: 0 16px 36px rgb(0 0 0 / 0.45);
+}
