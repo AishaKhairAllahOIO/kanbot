@@ -3,11 +3,13 @@ import * as DropdownMenu from "@radix-ui/react-dropdown-menu";
 import { AlertCircle, FolderKanban, MoreVertical, Pencil, Star, Trash2 } from "lucide-react";
 import { Link, NavLink, useParams } from "react-router";
 import { paths } from "@/shared/config/paths";
-import { Skeleton } from "@/shared/components/Skeleton";
 import { useStarredProjects } from "../hooks/useStarredProjects";
 import { useProjectActions } from "@/features/projects/hooks/useProjectActions";
 import { useCurrentProject } from "../../../shared/hooks/useCurrentProject";
 import { CollapseButton } from "./CollapseButton";
+import { prefetchRoute } from "../../../../../providers/router/routeModules";
+import { useLayoutStore } from "../../../store/layoutStore";
+import { ProjectReminderToggle } from "@/features/notifications/components/ProjectReminderToggle";
 
 export function AllProjects() {
   const listId = useId();
@@ -15,7 +17,8 @@ export function AllProjects() {
   const { projects, projectsLoading, projectsError, retryProjects } = useCurrentProject();
   const { isStarred, toggleStar } = useStarredProjects();
   const projectActions = useProjectActions();
-  const [open, setOpen] = useState(false);
+  const open = useLayoutStore((state) => state.isAllProjectsOpen);
+  const toggleOpen = useLayoutStore((state) => state.toggleAllProjects);
   const [menuOpenProjectId, setMenuOpenProjectId] = useState<string | null>(null);
 
   return (
@@ -40,7 +43,7 @@ export function AllProjects() {
         </NavLink>
         <CollapseButton
           open={open}
-          onToggle={() => setOpen((value) => !value)}
+          onToggle={toggleOpen}
           controls={listId}
           label="project list"
         />
@@ -56,6 +59,8 @@ export function AllProjects() {
                 <div className="flex min-h-9 min-w-0 items-center gap-1 rounded-sm transition-colors hover:bg-sunken">
                   <Link
                     to={`/projects/${project.id}/backlog`}
+                    onPointerEnter={() => prefetchRoute(`/projects/${project.id}/backlog`)}
+                    onFocus={() => prefetchRoute(`/projects/${project.id}/backlog`)}
                     aria-current={active ? "page" : undefined}
                     title={`${project.key} · ${project.name}`}
                     className={`flex min-h-9 min-w-0 flex-1 items-center gap-2 rounded-sm px-3 text-small transition-colors ${
@@ -69,6 +74,11 @@ export function AllProjects() {
                       {project.key}
                     </span>
                   </Link>
+                  <ProjectReminderToggle
+                    projectId={project.id}
+                    projectName={project.name}
+                    compact
+                  />
                   <DropdownMenu.Root
                     open={menuOpenProjectId === project.id}
                     onOpenChange={(open) => setMenuOpenProjectId(open ? project.id : null)}
@@ -87,7 +97,7 @@ export function AllProjects() {
                       <DropdownMenu.Content
                         align="end"
                         sideOffset={4}
-                        className="z-popover min-w-40 rounded-md border border-line bg-raised p-1 shadow-pop"
+                        className="z-popover rounded-md border border-line bg-raised p-1 shadow-pop"
                       >
                         <DropdownMenu.Item
                           className="menu-item"
@@ -118,10 +128,8 @@ export function AllProjects() {
             );
           })}
           {projectsLoading && (
-            <li className="grid gap-2 px-3 py-2" role="status" aria-label="Loading projects">
-              {Array.from({ length: 3 }, (_, index) => (
-                <Skeleton key={index} className="h-4 w-full" />
-              ))}
+            <li className="px-3 py-2 text-caption text-muted" role="status">
+              Loading projects…
             </li>
           )}
           {!projectsLoading && projects.length === 0 && !projectsError && (

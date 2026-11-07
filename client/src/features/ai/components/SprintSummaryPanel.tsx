@@ -1,10 +1,8 @@
-import { Sparkles } from 'lucide-react'
+import { Bot, RefreshCw, Sparkles } from 'lucide-react'
 import { getErrorMessage } from '../../../shared/api/errors'
 import { Button } from '../../../shared/components/Button'
-import { Skeleton } from '../../../shared/components/Skeleton'
 import type { SprintSummary } from '../../../shared/types/api'
 import { useSummarizeSprint } from '../hooks/useSummarizeSprint'
-import { AiChip } from './AiChip'
 import { AiErrorState } from './AiErrorState'
 import { AssistantMarkdown } from './AssistantMarkdown'
 
@@ -13,6 +11,7 @@ interface SprintSummaryPanelProps {
   summary: SprintSummary | null
   disabled?: boolean
   className?: string
+  onViewSprint?: () => void
 }
 
 export function SprintSummaryPanel({
@@ -20,6 +19,7 @@ export function SprintSummaryPanel({
   summary,
   disabled = false,
   className = '',
+  onViewSprint,
 }: SprintSummaryPanelProps) {
   const summarizeSprint = useSummarizeSprint()
   const generatedSummary =
@@ -31,38 +31,43 @@ export function SprintSummaryPanel({
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-2">
           <span className="grid size-8 place-content-center rounded-md bg-brand-soft text-brand-ink">
-            <Sparkles aria-hidden="true" className="size-4" />
+            <Bot aria-hidden="true" className="size-4" />
           </span>
           <h3 className="font-heading text-heading font-semibold text-ink">AI Summary</h3>
-          <AiChip />
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          {content && (
-            <span className="text-caption text-muted">
-              Generated {new Date(content.generatedAt).toLocaleString()}
-            </span>
+          {content && onViewSprint && (
+            <Button
+              size="sm"
+              variant="secondary"
+              onClick={onViewSprint}
+            >
+              View in Sprints History
+            </Button>
           )}
           <Button
             size="sm"
             variant="secondary"
+            className="hover:text-brand-ink"
             loading={summarizeSprint.isPending}
             disabled={disabled}
             onClick={() => summarizeSprint.mutate(sprintId)}
+            leadingIcon={
+              content ? (
+                <RefreshCw aria-hidden="true" className="size-3.5 text-brand-ink" />
+              ) : (
+                <Sparkles aria-hidden="true" className="size-3.5 text-brand-ink" />
+              )
+            }
           >
             {content ? 'Regenerate' : 'Summarize'}
           </Button>
         </div>
       </header>
 
-      {summarizeSprint.isPending ? (
-        <div className="grid gap-2" role="status" aria-label="Generating summary">
-          <Skeleton className="h-4 w-full" />
-          <Skeleton className="h-4 w-11/12" />
-          <Skeleton className="h-4 w-3/4" />
-        </div>
-      ) : content ? (
+      {content ? (
         <AssistantMarkdown content={content.content} />
-      ) : (
+      ) : !summarizeSprint.isPending && (
         <p className="text-small text-muted">
           {disabled
             ? 'Start this sprint before generating a summary.'
@@ -77,6 +82,11 @@ export function SprintSummaryPanel({
         />
       )}
 
+      {content && (
+        <p className="text-caption text-muted">
+          Generated {new Date(content.generatedAt).toLocaleString()}
+        </p>
+      )}
       <p className="text-caption text-muted">AI can make mistakes. Review before saving.</p>
     </section>
   )

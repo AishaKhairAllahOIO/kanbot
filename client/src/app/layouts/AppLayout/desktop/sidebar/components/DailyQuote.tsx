@@ -23,7 +23,7 @@ export function DailyQuote() {
           <RefreshCw aria-hidden="true" className="size-4" />
         </button>
       </div>
-      <blockquote className="mt-1.5 line-clamp-3 text-small italic text-ink">
+      <blockquote className="mt-1.5 line-clamp-3 text-small text-ink">
         {quote.text}
       </blockquote>
       <span className="mt-2 block truncate text-caption text-muted">{quote.author}</span>

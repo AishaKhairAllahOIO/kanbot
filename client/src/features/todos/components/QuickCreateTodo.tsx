@@ -1,8 +1,8 @@
 import { useRef, useState, type FormEvent, type KeyboardEvent } from 'react'
 import { Plus } from 'lucide-react'
-import { getErrorMessage } from '../../../shared/api/errors'
-import { Button } from '../../../shared/components/Button'
-import { useTodoMutations } from '../hooks/useTodos'
+import { getErrorMessage } from '@/shared/api/errors'
+import { Button } from '@/shared/components/Button'
+import { useTodoMutations } from '@/features/todos/hooks/useTodos'
 
 interface QuickCreateTodoProps {
   projectId: string

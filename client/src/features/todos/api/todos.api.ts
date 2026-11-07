@@ -50,4 +50,7 @@ export const todosApi = {
 
   remove: (todoId: string) =>
     request<void>("DELETE", TODOS_ENDPOINTS.DELETE(todoId)),
+
+  restore: (todoId: string) =>
+    request<{ todo: Todo }>("POST", TODOS_ENDPOINTS.RESTORE(todoId)),
 };

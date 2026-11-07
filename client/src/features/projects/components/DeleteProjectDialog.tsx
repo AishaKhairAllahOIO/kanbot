@@ -78,9 +78,7 @@ export function DeleteProjectDialog({ project, pending, onOpenChange, onConfirm 
             onChange={(event) => setConfirmation(event.currentTarget.value)}
             aria-invalid={confirmation.length > 0 && !canDelete ? true : undefined}
             aria-describedby={error ? 'delete-project-name-error' : 'delete-project-name-hint'}
-            className="border-danger/50 bg-danger/5 focus:border-danger focus-visible:outline-danger"
-            disabled={pending}
-          />
+className="border-danger/50 bg-danger/5 focus:border-danger focus:outline-none focus:ring-0 focus-visible:outline-none"          />
           {!error && (
             <p id="delete-project-name-hint" className="text-caption text-muted">
               The delete button will be enabled once the name matches.

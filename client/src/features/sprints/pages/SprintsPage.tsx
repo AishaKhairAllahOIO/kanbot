@@ -1,6 +1,6 @@
-import { useState } from 'react'
-import { Link, useParams } from 'react-router'
-import { ArrowRight, CalendarDays, Check, Circle, TrendingUp } from 'lucide-react'
+import { useEffect } from 'react'
+import { Link, useLocation, useNavigate, useParams } from 'react-router'
+import { ArrowRight, CalendarDays, Check, Circle } from 'lucide-react'
 import { getErrorMessage } from '../../../shared/api/errors'
 import { Button } from '../../../shared/components/Button'
 import { EmptyState } from '../../../shared/components/EmptyState'
@@ -8,18 +8,20 @@ import { Skeleton } from '../../../shared/components/Skeleton'
 import { useDocumentTitle } from '../../../shared/hooks/useDocumentTitle'
 import type { Sprint } from '../../../shared/types/api'
 import { Topbar } from '@/app/layouts'
+import { useLayoutStore } from '@/app/layouts/AppLayout/store/layoutStore'
 import { SprintListPanel } from '../components/SprintListPanel'
 import { SprintOverviewPanel } from '../components/SprintOverviewPanel'
-import { VelocityChart } from '../components/VelocityChart'
 import { useSprints } from '../hooks/useSprints'
 
 export function SprintsPage() {
-  useDocumentTitle('Sprints')
+  useDocumentTitle('Sprints History')
   const { projectId = '' } = useParams()
+  const location = useLocation()
+  const navigate = useNavigate()
   const sprintsQuery = useSprints(projectId)
   const sprints = sprintsQuery.data?.sprints ?? []
-  const [selectedId, setSelectedId] = useState<string | null>(null)
-  const [activeTab, setActiveTab] = useState<'history' | 'velocity'>('history')
+  const selectedId = useLayoutStore((state) => state.selectedHistorySprintId)
+  const setSelectedId = useLayoutStore((state) => state.setSelectedHistorySprintId)
 
   const selectedSprint: Sprint | null =
     sprints.find((sprint) => sprint.id === selectedId) ??
@@ -27,6 +29,22 @@ export function SprintsPage() {
     sprints.find((sprint) => sprint.status === 'active') ??
     sprints[0] ??
     null
+
+  useEffect(() => {
+    const state = location.state as { focusSprintSummary?: boolean } | null
+    if (!state?.focusSprintSummary || !selectedSprint) return
+
+    const frame = window.requestAnimationFrame(() => {
+      document
+        .getElementById('sprint-ai-summary')
+        ?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      navigate(`${location.pathname}${location.search}${location.hash}`, {
+        replace: true,
+        state: null,
+      })
+    })
+    return () => window.cancelAnimationFrame(frame)
+  }, [location.hash, location.key, location.pathname, location.search, location.state, navigate, selectedSprint])
 
   const orderedSprints = [...sprints].sort((first, second) => {
     const statusOrder = { planned: 0, active: 1, completed: 2 }
@@ -41,45 +59,14 @@ export function SprintsPage() {
   return (
     <>
       <Topbar
-        title="Sprints"
-        meta={sprintsQuery.isPending
+        title="Sprints History"
+        meta={sprintsQuery.isLoading
           ? <span role="status" aria-label="Loading sprint summary"><Skeleton className="h-4 w-20" /></span>
           : <span className="shrink-0">{sprints.length} {sprints.length === 1 ? 'sprint' : 'sprints'}</span>}
       />
       <main className="page-gutter py-4 pb-8">
-        <div className="mb-5 flex flex-wrap items-center gap-2 border-b border-line">
-          <button
-            type="button"
-            role="tab"
-            aria-selected={activeTab === 'history'}
-            onClick={() => setActiveTab('history')}
-            className={`relative flex min-h-11 items-center gap-2 px-3 text-small transition-colors ${
-              activeTab === 'history'
-                ? 'font-semibold text-brand-ink after:absolute after:inset-x-2 after:bottom-0 after:h-0.5 after:rounded-full after:bg-brand'
-                : 'text-muted hover:bg-sunken/70 hover:text-ink'
-            }`}
-          >
-            <CalendarDays aria-hidden="true" className={`size-4 ${activeTab === 'history' ? 'text-brand-ink' : ''}`} />
-            Sprints History
-          </button>
-          <button
-            type="button"
-            role="tab"
-            aria-selected={activeTab === 'velocity'}
-            onClick={() => setActiveTab('velocity')}
-            className={`relative flex min-h-11 items-center gap-2 px-3 text-small transition-colors ${
-              activeTab === 'velocity'
-                ? 'font-semibold text-brand-ink after:absolute after:inset-x-2 after:bottom-0 after:h-0.5 after:rounded-full after:bg-brand'
-                : 'text-muted hover:bg-sunken/70 hover:text-ink'
-            }`}
-          >
-            <TrendingUp aria-hidden="true" className={`size-4 ${activeTab === 'velocity' ? 'text-brand-ink' : ''}`} />
-            Velocity & Analytics
-          </button>
-        </div>
-
-        {sprintsQuery.isPending ? (
-          activeTab === 'velocity' ? <VelocityLoadingSkeleton /> : <SprintHistorySkeleton />
+        {sprintsQuery.isLoading ? (
+          <SprintHistorySkeleton />
         ) : sprintsQuery.isError ? (
           <EmptyState
             title="Sprints could not be loaded"
@@ -89,10 +76,8 @@ export function SprintsPage() {
           />
         ) : sprints.length === 0 ? (
           <SprintHistoryEmptyState projectId={projectId} />
-        ) : activeTab === 'velocity' ? (
-          <VelocityChart sprints={sprints} />
         ) : (
-          <div className="grid gap-5 lg:grid-cols-[1fr_1.5fr]">
+          <div className="grid gap-5 lg:grid-cols-[1fr_1.5fr] lg:items-start">
             <SprintListPanel
               sprints={orderedSprints}
               selectedSprintId={selectedSprint?.id ?? null}
@@ -144,7 +129,7 @@ function SprintHistoryEmptyState({ projectId }: { projectId: string }) {
               <p className="mt-0.5 text-caption text-muted">Turn a plan into visible progress</p>
             </div>
             <span className="grid size-9 place-content-center rounded-full bg-info/10 text-info">
-              <TrendingUp aria-hidden="true" className="size-4" />
+              <CalendarDays aria-hidden="true" className="size-4" />
             </span>
           </div>
           <div className="grid gap-3">
@@ -222,41 +207,5 @@ function SprintHistorySkeleton() {
         <Skeleton className="h-40 w-full" />
       </section>
     </div>
-  )
-}
-
-function VelocityLoadingSkeleton() {
-  return (
-    <section className="theme-card grid min-w-0 gap-5 overflow-hidden rounded-md p-4 sm:p-5" role="status" aria-label="Loading sprint velocity">
-      <header className="grid gap-3 border-b border-line pb-4 sm:flex sm:items-start sm:justify-between">
-        <div className="grid gap-2">
-          <Skeleton className="h-7 w-48" />
-          <Skeleton className="h-4 w-72 max-w-full" />
-        </div>
-        <Skeleton className="h-6 w-28 rounded-full" />
-      </header>
-      <div className="grid grid-cols-2 gap-3 xl:grid-cols-4">
-        {Array.from({ length: 4 }, (_, index) => (
-          <div key={index} className="grid gap-2 rounded-md border border-line p-3">
-            <Skeleton className="h-3 w-24" />
-            <Skeleton className="h-7 w-20" />
-            <Skeleton className="h-3 w-28" />
-          </div>
-        ))}
-      </div>
-      <div className="grid gap-3">
-        <Skeleton className="h-5 w-36" />
-        {Array.from({ length: 4 }, (_, index) => (
-          <div key={index} className="grid min-h-12 grid-cols-[minmax(5.5rem,0.7fr)_minmax(0,2fr)_auto] items-center gap-3 px-2 sm:grid-cols-[minmax(8rem,0.8fr)_minmax(0,2fr)_5rem]">
-            <div className="grid gap-1">
-              <Skeleton className="h-4 w-24" />
-              <Skeleton className="h-3 w-20" />
-            </div>
-            <Skeleton className="h-3 w-full rounded-full" />
-            <Skeleton className="h-4 w-12" />
-          </div>
-        ))}
-      </div>
-    </section>
   )
 }

@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import { ArrowRight, ChevronDown, Flag, Trash2, X } from 'lucide-react'
-import type { Sprint, TodoPriority } from '../../../shared/types/api'
-import { getErrorMessage } from '../../../shared/api/errors'
-import { Button } from '../../../shared/components/Button'
-import { Modal } from '../../../shared/components/Modal'
-import { Spinner } from '../../../shared/components/Spinner'
+import type { Sprint, TodoPriority } from '@/shared/types/api'
+import { getErrorMessage } from '@/shared/api/errors'
+import { Button } from '@/shared/components/Button'
+import { Modal } from '@/shared/components/Modal'
+import { Spinner } from '@/shared/components/Spinner'
 
 interface BulkActionsBarProps {
   selectedCount: number
@@ -77,7 +77,7 @@ export function BulkActionsBar({
               <DropdownMenu.Content
                 align="center"
                 sideOffset={6}
-                className="z-popover min-w-44 rounded-md border border-line bg-raised p-1 shadow-pop"
+                className="z-popover rounded-md border border-line bg-raised p-1 shadow-pop"
               >
                 <DropdownMenu.Item className="menu-item" onSelect={() => runAction(() => onMoveToSprint(null))}>
                   Backlog
@@ -107,7 +107,7 @@ export function BulkActionsBar({
               <DropdownMenu.Content
                 align="center"
                 sideOffset={6}
-                className="z-popover min-w-36 rounded-md border border-line bg-raised p-1 shadow-pop"
+                className="z-popover rounded-md border border-line bg-raised p-1 shadow-pop"
               >
                 <DropdownMenu.Item className="menu-item" onSelect={() => runAction(() => onChangePriority('low'))}>
                   Low
@@ -153,7 +153,7 @@ export function BulkActionsBar({
         open={deleteConfirmOpen}
         onOpenChange={setDeleteConfirmOpen}
         title={`Delete ${selectedCount} ${selectedCount === 1 ? 'todo' : 'todos'}?`}
-        description="This action cannot be undone. All selected todos will be permanently deleted."
+        description="Selected todos will be deleted. You can undo this for a short time after deletion."
         size="confirm"
       >
         <footer className="mt-4 flex justify-end gap-2 border-t border-line pt-3">

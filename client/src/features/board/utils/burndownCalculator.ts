@@ -1,5 +1,5 @@
 import { addDays, differenceInCalendarDays, endOfDay, format, isAfter, parseISO, startOfDay } from 'date-fns'
-import type { Sprint, Todo } from '../../../shared/types/api'
+import type { Sprint, Todo } from '@/shared/types/api'
 
 export interface BurndownDay {
   date: string
@@ -82,4 +82,3 @@ export function computeBurndownData(sprint: Sprint, todos: Todo[]): BurndownData
     isOverCapacity: runningRemaining > 0 && isAfter(today, end),
   }
 }
-

@@ -8,7 +8,7 @@ import {
   type DragEndEvent,
 } from '@dnd-kit/core'
 import { SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from '@dnd-kit/sortable'
-import type { MoveTodoRequest, Sprint, Todo } from '../../../shared/types/api'
+import type { MoveTodoRequest, Sprint, Todo } from '@/shared/types/api'
 import { TodoRow } from './TodoRow'
 
 interface SortableTodoListProps {
@@ -18,6 +18,7 @@ interface SortableTodoListProps {
   listId?: string
   manageDragContext?: boolean
   isSelected?: (todoId: string) => boolean
+  highlightedTodoIds?: ReadonlySet<string>
   onToggleSelect?: (todoId: string) => void
   onOpen: (todoId: string) => void
   onMove: (todoId: string, body: MoveTodoRequest) => void
@@ -31,6 +32,7 @@ export function SortableTodoList({
   listId = 'local',
   manageDragContext = true,
   isSelected,
+  highlightedTodoIds,
   onToggleSelect,
   onOpen,
   onMove,
@@ -63,6 +65,7 @@ export function SortableTodoList({
             listId={listId}
             itemIds={todoIds}
             isSelected={isSelected?.(todo.id)}
+            isNewlyAdded={highlightedTodoIds?.has(todo.id)}
             onToggleSelect={onToggleSelect}
             onOpen={onOpen}
             onMove={onMove}

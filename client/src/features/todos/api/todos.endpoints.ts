@@ -8,4 +8,5 @@ export const TODOS_ENDPOINTS = {
   UPDATE: (todoId: ApiId) => `/todos/${todoId}`,
   MOVE: (todoId: ApiId) => `/todos/${todoId}/move`,
   DELETE: (todoId: ApiId) => `/todos/${todoId}`,
+  RESTORE: (todoId: ApiId) => `/todos/${todoId}/restore`,
 } as const;

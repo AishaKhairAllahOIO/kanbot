@@ -127,6 +127,14 @@
   grid-template-columns: auto minmax(0, 1fr) 8rem 8rem 6rem;
 }
 
+@utility scrollbar-hidden {
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+}
+
 @utility toolbar-grid {
   grid-template-columns: minmax(13rem, 1fr) 6rem 6rem auto;
 }
@@ -158,6 +166,46 @@
    Base
    ========================================================================== */
 @layer base {
+  [data-radix-menu-content],
+  [data-radix-menu-sub-content] {
+    min-width: var(--radix-dropdown-menu-trigger-width);
+    max-width: var(--radix-dropdown-menu-content-available-width);
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+  }
+
+  *:hover {
+    scrollbar-color: color-mix(in srgb, var(--text-muted) 55%, transparent) transparent;
+  }
+
+  *::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  *::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  *::-webkit-scrollbar-thumb {
+    border: 1px solid transparent;
+    border-radius: 9999px;
+    background: transparent;
+    background-clip: padding-box;
+    transition: background-color var(--dur-fast) var(--ease);
+  }
+
+  *:hover::-webkit-scrollbar-thumb {
+    background-color: color-mix(in srgb, var(--text-muted) 55%, transparent);
+  }
+
+  *:hover::-webkit-scrollbar-thumb:hover {
+    background-color: var(--text-subtle);
+  }
+
   html {
     height: 100%;
     background: var(--canvas);
@@ -186,16 +234,26 @@
     font: inherit;
   }
 
-  :focus-visible {
+  :focus-visible:not([type='checkbox']) {
     outline: 2px solid var(--focus);
     outline-offset: 2px;
   }
 
-  :is(input, textarea, select):focus {
+  :is(input:not([type='checkbox']), textarea, select):focus {
     border-color: var(--brand);
     outline: 2px solid var(--brand);
     outline-offset: 0;
     box-shadow: none;
+  }
+
+  input[type='checkbox']:focus {
+    outline: none;
+    box-shadow: none;
+  }
+
+  input[type='checkbox']:focus-visible {
+    outline: none;
+    box-shadow: 0 0 0 2px var(--surface), 0 0 0 4px var(--focus);
   }
 
   :is(input, textarea, select)[aria-invalid='true']:focus {
@@ -221,17 +279,158 @@
    Components (inside a layer so Tailwind utilities can still override them)
    ========================================================================== */
 @layer components {
+  .app-topbar .topbar-action {
+    transition:
+      color var(--dur-fast) var(--ease),
+      background-color var(--dur-fast) var(--ease),
+      border-color var(--dur-fast) var(--ease);
+  }
+
+  .app-topbar .topbar-action > svg {
+    color: var(--brand-ink);
+    transition: transform var(--dur-fast) var(--ease);
+  }
+
+  .app-topbar .topbar-action:hover:not(:disabled) > svg {
+    transform: scale(1.06);
+  }
+
+  .app-topbar .topbar-action:hover:not(:disabled) {
+    color: var(--brand-ink);
+  }
+
+  .app-topbar .topbar-action:focus-visible {
+    outline-color: var(--focus);
+    outline-offset: 2px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .app-topbar .topbar-action > svg {
+      transition: none;
+    }
+
+    .app-topbar .topbar-action:hover:not(:disabled) > svg {
+      transform: none;
+    }
+  }
+
+  .board-column {
+    align-self: start;
+  }
+
+  .board-card {
+    transition:
+      transform var(--dur-base) var(--ease),
+      border-color var(--dur-fast) var(--ease),
+      box-shadow var(--dur-fast) var(--ease),
+      opacity var(--dur-fast) var(--ease);
+  }
+
+  .board-card[data-dragging='true'] {
+    border-color: var(--border-strong);
+    border-style: dashed;
+    opacity: 0.38;
+    box-shadow: none;
+  }
+
+  .board-card[data-done-flash='true'] {
+    animation: board-done-flash 600ms var(--ease);
+  }
+
+  .theme-card.board-drag-overlay {
+    box-shadow:
+      0 6px 16px rgb(0 0 0 / 0.14),
+      0 1px 3px rgb(0 0 0 / 0.1);
+  }
+
+  .board-drop-placeholder {
+    animation: board-placeholder-in var(--dur-base) var(--ease) both;
+  }
+
+  @keyframes board-placeholder-in {
+    from {
+      opacity: 0.3;
+    }
+
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes board-done-flash {
+    0%,
+    100% {
+      background-color: var(--surface);
+    }
+
+    50% {
+      background-color: color-mix(in srgb, var(--status-done) 12%, var(--surface));
+    }
+  }
+
+  @media (min-width: 64rem) {
+    .board-drag-overlay {
+      animation: board-drag-lift var(--dur-fast) var(--ease) both;
+    }
+
+    @keyframes board-drag-lift {
+      from {
+        scale: 1;
+      }
+
+      to {
+        scale: 1.02;
+      }
+    }
+  }
+
+  .sidebar-scroll-cue-blur-top,
+  .sidebar-scroll-cue-blur-bottom {
+    background: linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--surface) 96%, transparent),
+      color-mix(in srgb, var(--surface) 75%, transparent) 55%,
+      transparent
+    );
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
+    -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 35%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 0%, #000 35%, transparent 100%);
+  }
+
+  .plan-todo-scroll-fade {
+    isolation: isolate;
+  }
+
+  .plan-todo-scroll-fade::before {
+    position: absolute;
+    z-index: -1;
+    inset: 0;
+    content: "";
+    background: linear-gradient(
+      to bottom,
+      color-mix(in srgb, var(--surface) 72%, transparent) 0%,
+      color-mix(in srgb, var(--surface) 45%, transparent) 35%,
+      color-mix(in srgb, var(--surface) 18%, transparent) 68%,
+      transparent 100%
+    );
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
+    -webkit-mask-image: linear-gradient(to bottom, #000 0%, #000 8%, transparent 100%);
+    mask-image: linear-gradient(to bottom, #000 0%, #000 8%, transparent 100%);
+    pointer-events: none;
+  }
+
+  .plan-todo-scroll-fade-bottom::before {
+    transform: rotate(180deg);
+  }
+
+  .sidebar-scroll-cue-blur-bottom {
+    transform: rotate(180deg);
+  }
+
   .page-gutter {
     padding-inline: calc(var(--spacing) * 4);
-  }
-
-  .sidebar-content-scroll {
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-  }
-
-  .sidebar-content-scroll::-webkit-scrollbar {
-    display: none;
   }
 
   @media (min-width: 48rem) {
@@ -254,6 +453,10 @@
     border-radius: var(--radius-lg);
     background: var(--surface);
     box-shadow: var(--shadow-modal);
+  }
+
+  .dialog-panel--bounded {
+    height: calc(100dvh - var(--spacing) * 8);
   }
 
   .menu-item {
@@ -334,5 +537,27 @@
     animation-duration: 1ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 1ms !important;
+  }
+
+  .board-card {
+    transition: opacity var(--dur-fast) var(--ease);
+  }
+
+  .board-card[data-done-flash='true'] {
+    animation: none;
+  }
+
+  .board-drag-overlay {
+    animation: board-drag-fade var(--dur-fast) var(--ease) both;
+  }
+
+  @keyframes board-drag-fade {
+    from {
+      opacity: 0.7;
+    }
+
+    to {
+      opacity: 1;
+    }
   }
 }

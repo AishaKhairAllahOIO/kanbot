@@ -24,25 +24,21 @@
   --info: #0369a1;
   --star: var(--warning);
 
-  /* Status */
-  --status-todo: #5b6780;
-  --status-in-progress: var(--info);
-  --status-in-review: #b45309;
-  --status-done: var(--success);
+--status-todo: #0e7490;
+--status-in-progress: #2563eb;
+--status-in-review: #9333ea;
+--status-done: var(--success);
 
-  /* Priority */
-  --priority-low: var(--text-subtle);
-  --priority-medium: var(--text);
-  --priority-high: #c2410c;
-  --priority-urgent: var(--danger);
+--priority-low: #0f766e;
+--priority-medium: #2563eb;
+--priority-high: #c2410c;
+--priority-urgent: var(--danger);
 
-  /* Issue type */
-  --type-task: #4b5c7a;
-  --type-story: #0f766e;
-  --type-bug: #a21caf;
+--type-task: #2563eb;
+--type-story: #047857;
+--type-bug: #dc2626;
 
-  /* Labels */
-  --label-blue: #2563eb;
+--label-blue: #2563eb;
   --label-indigo: #4f46e5;
   --label-purple: #9333ea;
   --label-pink: #db2777;
@@ -65,11 +61,11 @@
   --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
 
   /* Layout */
-  --topbar-height: 4rem;
+  --topbar-height: 4.25rem;
   --bottom-nav-height: 4rem;
   --sidebar-width: 14.5rem;
   --sidebar-section-indent: 1.125rem;
-  --board-column-min: 17.5rem;
+  --board-column-min: 12.5rem;
 
   /* Stacking */
   --z-sticky: 10;
@@ -102,15 +98,23 @@
   --success: #4ade80;
   --info: #38bdf8;
 
-  --status-todo: #9aa5bd;
-  --status-in-review: var(--warning);
+  /* ===== Dark (داخل :root[data-theme='dark']) ===== */
 
-  --priority-medium: #c5ccdb;
-  --priority-high: #fb923c;
+/* Status */
+--status-todo: #22d3ee;
+--status-in-progress: #60a5fa;
+--status-in-review: #c084fc;
+/* --status-done بتتبع --success تلقائياً */
 
-  --type-task: #9aa5bd;
-  --type-story: #2dd4bf;
-  --type-bug: #e879f9;
+/* Priority */
+--priority-low: #2dd4bf;
+--priority-medium: #60a5fa;
+--priority-high: #fb923c;
+
+/* Issue type */
+--type-task: #60a5fa;
+--type-story: #34d399;
+--type-bug: #f87171;
 
   --label-blue: #93c5fd;
   --label-indigo: #a5b4fc;

@@ -1,13 +1,15 @@
 import { Send } from 'lucide-react'
+import type { RefObject } from 'react'
 
 interface AssistantComposerProps {
+  textareaRef: RefObject<HTMLTextAreaElement | null>
   value: string
   onChange: (value: string) => void
   onSubmit: () => void
   disabled: boolean
 }
 
-export function AssistantComposer({ value, onChange, onSubmit, disabled }: AssistantComposerProps) {
+export function AssistantComposer({ textareaRef, value, onChange, onSubmit, disabled }: AssistantComposerProps) {
   const canSend = Boolean(value.trim()) && !disabled
 
   return (
@@ -24,6 +26,7 @@ export function AssistantComposer({ value, onChange, onSubmit, disabled }: Assis
             Message the assistant
           </label>
           <textarea
+            ref={textareaRef}
             id="assistant-message"
             rows={1}
             maxLength={4000}
@@ -35,7 +38,7 @@ export function AssistantComposer({ value, onChange, onSubmit, disabled }: Assis
                 if (canSend) onSubmit()
               }
             }}
-            placeholder="Ask anything about your sprint..."
+            placeholder="Ask anything about the project ..."
             className="min-h-11 max-h-32 flex-1 resize-none bg-transparent px-2 py-2 text-body text-ink outline-none placeholder:text-subtle focus:outline-none"
           />
           <button
@@ -48,7 +51,7 @@ export function AssistantComposer({ value, onChange, onSubmit, disabled }: Assis
           </button>
         </div>
       </form>
-      <div className="mt-2 grid gap-0.5 px-1 text-caption text-muted">
+      <div className="mt-2 flex items-center justify-between gap-2 whitespace-nowrap px-1 text-[0.625rem] text-muted">
         <span>Enter to send · Shift+Enter for a new line</span>
         <span>AI can make mistakes. Review before saving.</span>
       </div>

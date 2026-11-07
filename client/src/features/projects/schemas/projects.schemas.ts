@@ -1,5 +1,3 @@
-
-
 import { z } from 'zod'
 
 const projectKey = z.string().trim().regex(/^[a-zA-Z]{2,6}$/, 'Use 2 to 6 letters')

@@ -12,6 +12,7 @@ import { useRegister } from '../hooks/useRegister'
 import { registerSchema, type RegisterValues } from '../schemas/auth.schemas'
 import { applyServerErrors } from '../utils/applyServerErrors'
 
+
 export function RegisterForm() {
   const registerAccount = useRegister()
   const [formError, setFormError] = useState('')

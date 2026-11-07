@@ -1,2 +1,2 @@
-export { AuthLayout } from './AuthLayout'
+export { AuthLayout } from './AuthLayout/AuthLayout'
 export { AppLayout, Topbar, useStarredProjects } from './AppLayout'

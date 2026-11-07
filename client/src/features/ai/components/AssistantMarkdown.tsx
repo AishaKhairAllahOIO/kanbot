@@ -1,26 +1,18 @@
-import ReactMarkdown from 'react-markdown'
+import { lazy, Suspense } from 'react'
 
 interface AssistantMarkdownProps {
   content: string
   className?: string
 }
 
-/** Renders assistant Markdown. Raw HTML is skipped, never injected. */
+const MarkdownRenderer = lazy(() => import('./MarkdownRenderer'))
+
 export function AssistantMarkdown({ content, className = '' }: AssistantMarkdownProps) {
   return (
     <div className={`markdown-content text-body text-ink ${className}`}>
-      <ReactMarkdown
-        skipHtml
-        components={{
-          a: ({ href, children }) => (
-            <a href={href} target="_blank" rel="noopener noreferrer">
-              {children}
-            </a>
-          ),
-        }}
-      >
-        {content}
-      </ReactMarkdown>
+      <Suspense fallback={<p className="whitespace-pre-wrap break-words">{content}</p>}>
+        <MarkdownRenderer content={content} />
+      </Suspense>
     </div>
   )
 }

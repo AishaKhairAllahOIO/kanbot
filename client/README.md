@@ -45,6 +45,8 @@ Set `VITE_API_URL` in `client/.env` to override the API base URL. It defaults to
 - Create, edit, delete, and start planned sprints; view the active board; move cards between statuses; complete sprints and carry unfinished work.
 - View sprint history and details, and generate sprint summaries.
 - Chat with the AI assistant, generate editable todo drafts, and plan a sprint from backlog todos.
+- Enable client-side due-date reminders per project. Reminders use browser notifications while the app tab is open; schedule and notification permission are configured in the profile.
+- Review the last seven days of completed todos and their activity by day on the profile page.
 - Responsive navigation, theme toggle, loading/error/empty states, keyboard interaction, and mutation feedback.
 
 ## Validation

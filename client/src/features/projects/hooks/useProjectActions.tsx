@@ -1,8 +1,11 @@
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 import { useNavigate } from 'react-router'
 import type { ProjectWithStats } from '../../../shared/types/api'
 import { DeleteProjectDialog } from '../components/DeleteProjectDialog'
-import { ProjectFormDialog } from '../components/ProjectFormDialog'
+import {
+  LazyProjectEditorDialog,
+  prefetchProjectEditorDialog,
+} from '../components/projectEditorDialogLoader'
 import { useProjectMutations } from './useProjects'
 
 export function useProjectActions() {
@@ -31,15 +34,19 @@ export function useProjectActions() {
 
   const dialogs = (
     <>
-      <ProjectFormDialog
-        open={formOpen}
-        project={editing}
-        onOpenChange={setFormOpen}
-        onCreated={(projectId) => {
-          setFormOpen(false)
-          navigate(`/projects/${projectId}/backlog`)
-        }}
-      />
+      {formOpen && (
+        <Suspense fallback={null}>
+          <LazyProjectEditorDialog
+            open
+            project={editing}
+            onOpenChange={setFormOpen}
+            onCreated={(projectId) => {
+              setFormOpen(false)
+              navigate(`/projects/${projectId}/backlog`)
+            }}
+          />
+        </Suspense>
+      )}
       <DeleteProjectDialog
         project={deleting}
         pending={mutations.remove.isPending}
@@ -54,6 +61,7 @@ export function useProjectActions() {
     openCreate,
     openEdit,
     openDelete: setDeleting,
+    prefetchProjectEditorDialog,
     dialogs,
   }
 }

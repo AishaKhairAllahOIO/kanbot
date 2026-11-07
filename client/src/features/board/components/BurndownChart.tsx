@@ -1,6 +1,6 @@
 import { useState } from 'react'
-import type { Sprint, Todo } from '../../../shared/types/api'
-import { computeBurndownData, type BurndownDay } from '../utils/burndownCalculator'
+import type { Sprint, Todo } from '@/shared/types/api'
+import { computeBurndownData, type BurndownDay } from '@/features/board/utils/burndownCalculator'
 
 interface BurndownChartProps {
   sprint: Sprint

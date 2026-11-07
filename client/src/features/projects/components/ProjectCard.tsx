@@ -1,18 +1,21 @@
 import { Folder, Pencil, Star, Trash2 } from 'lucide-react'
 import { Link } from 'react-router'
+import { prefetchRoute } from '@/app/providers/router/routeModules'
 import type { ProjectWithStats } from '../../../shared/types/api'
 import type { UpdateProjectRequest } from '../../../shared/types/api'
 import { useStarredProjects } from '@/app/layouts'
 import { InlineProjectField } from './InlineProjectField'
+import { ProjectReminderToggle } from '@/features/notifications/components/ProjectReminderToggle'
 
 interface ProjectCardProps {
   project: ProjectWithStats
   onUpdate: (body: UpdateProjectRequest) => Promise<unknown>
   onEdit: () => void
   onDelete: () => void
+  onPrefetchEditor: () => void
 }
 
-export function ProjectCard({ project, onUpdate, onEdit, onDelete }: ProjectCardProps) {
+export function ProjectCard({ project, onUpdate, onEdit, onDelete, onPrefetchEditor }: ProjectCardProps) {
   const activeSprint = project.stats.activeSprint
   const { isStarred, toggleStar } = useStarredProjects()
   const starred = isStarred(project.id)
@@ -63,10 +66,13 @@ export function ProjectCard({ project, onUpdate, onEdit, onDelete }: ProjectCard
           >
             <Star aria-hidden="true" className={`size-4 ${starred ? 'fill-star text-star' : ''}`} />
           </button>
+          <ProjectReminderToggle projectId={project.id} projectName={project.name} />
           <button
             type="button"
             aria-label={`Edit ${project.name}`}
             onClick={onEdit}
+            onPointerEnter={onPrefetchEditor}
+            onFocus={onPrefetchEditor}
             className="rounded-sm p-2 text-muted hover:bg-sunken hover:text-ink"
           >
             <Pencil aria-hidden="true" className="size-4" />
@@ -98,7 +104,12 @@ export function ProjectCard({ project, onUpdate, onEdit, onDelete }: ProjectCard
         <div className="flex min-w-0 items-center justify-between gap-2 text-caption text-muted">
           <span>{project.stats.backlogCount} backlog</span>
           {activeSprint ? (
-            <Link to={`/projects/${project.id}/board`} className="inline-flex min-w-0 max-w-[60%] items-center gap-1.5 text-ink hover:text-brand-ink">
+            <Link
+              to={`/projects/${project.id}/board`}
+              onPointerEnter={() => prefetchRoute(`/projects/${project.id}/board`)}
+              onFocus={() => prefetchRoute(`/projects/${project.id}/board`)}
+              className="inline-flex min-w-0 max-w-[60%] items-center gap-1.5 text-ink hover:text-brand-ink"
+            >
               <span className="size-2 shrink-0 rounded-full bg-signal" />
               <span className="truncate">{activeSprint.name} active</span>
             </Link>
@@ -108,6 +119,8 @@ export function ProjectCard({ project, onUpdate, onEdit, onDelete }: ProjectCard
         </div>
         <Link
           to={`/projects/${project.id}/backlog`}
+          onPointerEnter={() => prefetchRoute(`/projects/${project.id}/backlog`)}
+          onFocus={() => prefetchRoute(`/projects/${project.id}/backlog`)}
           className="mt-2 flex min-h-9 items-center justify-center rounded-sm border border-brand/30 text-small font-medium text-brand-ink transition-colors hover:bg-brand-soft"
         >
           Open project

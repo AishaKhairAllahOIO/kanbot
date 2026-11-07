@@ -1,9 +1,12 @@
 import { Lock } from "lucide-react";
 import { NavLink, useParams } from "react-router";
+import { StarredProjectsMenu } from "../desktop/sidebar/components/StarredProjectsMenu";
 import {
   PROJECTS_NAV_ITEM,
   useProjectNavItems,
 } from "../shared/hooks/useProjectNavItems";
+import { prefetchRoute } from "../../../providers/router/routeModules";
+import { DailyFocusButton } from "../desktop/sidebar/components/DailyFocusButton";
 
 const ITEM =
   "relative flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 text-nav font-medium transition-colors";
@@ -45,6 +48,8 @@ export function BottomNav() {
             key={item.label}
             to={item.to}
             end={item.end}
+            onPointerEnter={() => prefetchRoute(item.to)}
+            onFocus={() => prefetchRoute(item.to)}
             className={({ isActive }) =>
               `${ITEM} ${isActive ? "text-brand-ink" : "text-muted hover:text-ink"}`
             }
@@ -54,6 +59,15 @@ export function BottomNav() {
           </NavLink>
         );
       })}
+      <StarredProjectsMenu
+        side="top"
+        showLabel
+        className={`${ITEM} text-muted hover:text-ink`}
+      />
+      <DailyFocusButton
+        showLabel
+        className={`${ITEM} text-muted hover:text-ink`}
+      />
       {items.some((item) => !item.enabled) && (
         <span id="select-project-hint" className="sr-only">
           Select a project first to open project pages.

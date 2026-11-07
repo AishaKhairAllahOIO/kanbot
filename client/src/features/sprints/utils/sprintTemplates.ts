@@ -34,12 +34,8 @@ export function getSprintTemplate(projectId: string): SprintTemplate {
 
 export function saveSprintTemplate(projectId: string, template: SprintTemplate): void {
   if (!projectId || typeof window === 'undefined') return
-  try {
-    localStorage.setItem(getStorageKey(projectId), JSON.stringify(template))
-    window.dispatchEvent(new CustomEvent('kanbot:sprint-template-changed', { detail: { projectId } }))
-  } catch {
-    // ignore
-  }
+  localStorage.setItem(getStorageKey(projectId), JSON.stringify(template))
+  window.dispatchEvent(new CustomEvent('kanbot:sprint-template-changed', { detail: { projectId } }))
 }
 
 export function calculateSprintDatesFromTemplate(projectId: string): { startDate: string; endDate: string } {
@@ -50,4 +46,3 @@ export function calculateSprintDatesFromTemplate(projectId: string): { startDate
     endDate: format(addDays(start, template.defaultLengthDays), 'yyyy-MM-dd'),
   }
 }
-

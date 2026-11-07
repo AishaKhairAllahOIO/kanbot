@@ -3,6 +3,7 @@ import { Star } from "lucide-react";
 import { NavLink } from "react-router";
 import { useCurrentProject } from "../../../shared/hooks/useCurrentProject";
 import { useStarredProjects } from "../hooks/useStarredProjects";
+import { prefetchRoute } from "../../../../../providers/router/routeModules";
 
 /** Starred projects for quick switching. Always visible; shows a hint when empty. */
 export function StarredProjects() {
@@ -48,6 +49,8 @@ export function StarredProjects() {
             </button>
             <NavLink
               to={`/projects/${project.id}/backlog`}
+              onPointerEnter={() => prefetchRoute(`/projects/${project.id}/backlog`)}
+              onFocus={() => prefetchRoute(`/projects/${project.id}/backlog`)}
               className="flex min-h-10 min-w-0 flex-1 items-center text-body text-muted hover:text-ink"
             >
               <span className="truncate">{project.name}</span>

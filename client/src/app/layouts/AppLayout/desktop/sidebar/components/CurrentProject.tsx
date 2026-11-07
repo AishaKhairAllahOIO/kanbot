@@ -1,4 +1,4 @@
-import { useId, useState } from "react";
+import { useId } from "react";
 import { FolderKanban, Star } from "lucide-react";
 import { useParams } from "react-router";
 import { useCurrentProject } from "../../../shared/hooks/useCurrentProject";
@@ -6,6 +6,7 @@ import { useProjectNavItems } from "../../../shared/hooks/useProjectNavItems";
 import { useStarredProjects } from "../hooks/useStarredProjects";
 import { CollapseButton } from "./CollapseButton";
 import { SidebarNavItem } from "./SidebarNavItem";
+import { useLayoutStore } from "../../../store/layoutStore";
 
 export function CurrentProject() {
   const headingId = useId();
@@ -14,7 +15,8 @@ export function CurrentProject() {
   const { project } = useCurrentProject();
   const { isStarred, toggleStar } = useStarredProjects();
   const items = useProjectNavItems(projectId);
-  const [open, setOpen] = useState(true);
+  const open = useLayoutStore((state) => state.isCurrentProjectOpen);
+  const toggleOpen = useLayoutStore((state) => state.toggleCurrentProject);
 
   const starred = project ? isStarred(project.id) : false;
   const name = project ? ` ${project.name}` : "No project selected";
@@ -60,7 +62,7 @@ export function CurrentProject() {
         </div>
         <CollapseButton
           open={open}
-          onToggle={() => setOpen((value) => !value)}
+          onToggle={toggleOpen}
           controls={listId}
           label="project pages"
         />

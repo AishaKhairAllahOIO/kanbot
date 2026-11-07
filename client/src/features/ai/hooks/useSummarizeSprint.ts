@@ -16,7 +16,7 @@ export function useSummarizeSprint() {
         queryClient.invalidateQueries({ queryKey: queryKeys.sprints.detail(sprint.id) }),
         queryClient.invalidateQueries({ queryKey: queryKeys.sprints.board(sprint.id) }),
       ])
-      showToast('Summary saved')
+      showToast('Summary saved', 'success')
     },
   })
 }

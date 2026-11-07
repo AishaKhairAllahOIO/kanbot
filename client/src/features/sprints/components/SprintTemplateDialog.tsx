@@ -1,4 +1,5 @@
 import { useState, type FormEvent } from 'react'
+import { useToast } from '@/app/providers/toast'
 import { Modal } from '../../../shared/components/Modal'
 import { Button } from '../../../shared/components/Button'
 import { Field, SelectInput, TextInput } from '../../../shared/components/Field'
@@ -21,18 +22,27 @@ export function SprintTemplateDialog({
   onOpenChange,
 }: SprintTemplateDialogProps) {
   const [template, setTemplate] = useState<SprintTemplate>(() => getSprintTemplate(projectId))
+  const [saveError, setSaveError] = useState('')
+  const showToast = useToast()
 
   function handleOpenChange(nextOpen: boolean) {
     if (nextOpen) {
       setTemplate(getSprintTemplate(projectId))
+      setSaveError('')
     }
     onOpenChange(nextOpen)
   }
 
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    saveSprintTemplate(projectId, template)
-    onOpenChange(false)
+    setSaveError('')
+    try {
+      saveSprintTemplate(projectId, template)
+      showToast('Sprint template saved')
+      onOpenChange(false)
+    } catch {
+      setSaveError('Sprint template could not be saved in this browser.')
+    }
   }
 
   function handleReset() {
@@ -48,6 +58,7 @@ export function SprintTemplateDialog({
       size="form"
     >
       <form onSubmit={handleSubmit} className="grid gap-4 py-2">
+        {saveError && <p role="alert" className="text-small text-danger">{saveError}</p>}
         <Field id="default-length" label="Default Sprint Duration">
           <SelectInput
             id="default-length"
@@ -107,4 +118,3 @@ export function SprintTemplateDialog({
     </Modal>
   )
 }
-

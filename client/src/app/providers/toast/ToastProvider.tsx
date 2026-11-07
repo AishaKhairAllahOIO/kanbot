@@ -1,11 +1,12 @@
 import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react'
 import { CircleAlert, CircleCheck, Info, X } from 'lucide-react'
-import { API_ERROR_TOAST_EVENT, ToastContext, type ToastContextValue, type ToastKind } from './ToastContext'
+import { API_ERROR_TOAST_EVENT, ToastContext, type ToastAction, type ToastContextValue, type ToastKind } from './ToastContext'
 
 interface ToastItem {
   id: number
   message: string
   kind: ToastKind
+  action?: ToastAction
 }
 
 const icons = {
@@ -16,12 +17,12 @@ const icons = {
 
 export function ToastProvider({ children }: { children: ReactNode }) {
   const [toasts, setToasts] = useState<ToastItem[]>([])
-  const showToast = useCallback((message: string, kind: ToastKind = 'success') => {
+  const showToast = useCallback((message: string, kind: ToastKind = 'success', action?: ToastAction) => {
     const id = Date.now() + Math.random()
-    setToasts((current) => [...current.slice(-2), { id, message, kind }])
+    setToasts((current) => [...current.slice(-2), { id, message, kind, action }])
     window.setTimeout(() => {
       setToasts((current) => current.filter((toast) => toast.id !== id))
-    }, kind === 'error' ? 8000 : 4000)
+    }, action || kind === 'error' ? 8000 : 4000)
   }, [])
   const value = useMemo<ToastContextValue>(() => ({ showToast }), [showToast])
 
@@ -52,6 +53,18 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                 className={`mt-0.5 size-4 shrink-0 ${toast.kind === 'error' ? 'text-danger' : toast.kind === 'success' ? 'text-success' : 'text-info'}`}
               />
               <span className="min-w-0 flex-1 break-words">{toast.message}</span>
+              {toast.action && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setToasts((current) => current.filter((item) => item.id !== toast.id))
+                    toast.action?.onClick()
+                  }}
+                  className="shrink-0 rounded-sm px-1 py-0.5 text-small font-semibold text-brand-ink hover:bg-brand-soft"
+                >
+                  {toast.action.label}
+                </button>
+              )}
               <button
                 type="button"
                 aria-label="Dismiss notification"

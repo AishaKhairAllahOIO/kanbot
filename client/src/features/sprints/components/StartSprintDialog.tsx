@@ -3,7 +3,8 @@ import { useNavigate } from 'react-router'
 import { getErrorMessage } from '../../../shared/api/errors'
 import type { Sprint } from '../../../shared/types/api'
 import { Button } from '../../../shared/components/Button'
-import { Field, TextInput } from '../../../shared/components/Field'
+import { Field } from '../../../shared/components/Field'
+import { DatePickerInput } from '../../../shared/components/DatePickerInput'
 import { Modal } from '../../../shared/components/Modal'
 import { useStartSprint } from '../hooks/useStartSprint'
 import { getDefaultSprintDates } from '../utils/sprintDates'
@@ -49,10 +50,10 @@ export function StartSprintDialog({ open, sprint, onOpenChange }: StartSprintDia
       <form onSubmit={startSprint} className="grid gap-4">
         {error && <p role="alert" className="rounded-sm bg-danger/10 p-3 text-small text-ink">{error}</p>}
         <Field id="start-date" label="Start date">
-          <TextInput id="start-date" type="date" value={startDate} onChange={(event) => setStartDate(event.target.value)} />
+          <DatePickerInput id="start-date" value={startDate} onValueChange={setStartDate} />
         </Field>
         <Field id="end-date" label="End date">
-          <TextInput id="end-date" type="date" min={startDate} value={endDate} onChange={(event) => setEndDate(event.target.value)} />
+          <DatePickerInput id="end-date" min={startDate} value={endDate} onValueChange={setEndDate} />
         </Field>
         <footer className="flex justify-end gap-2 border-t border-line pt-4">
           <Button type="button" onClick={() => handleOpenChange(false)}>Cancel</Button>

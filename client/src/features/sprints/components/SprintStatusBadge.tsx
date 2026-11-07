@@ -9,8 +9,7 @@ const config = {
 export function SprintStatusBadge({ status }: { status: SprintStatus }) {
   const { label, className } = config[status]
   return (
-    <span className={`inline-flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-caption font-medium ${className}`}>
-      <span className="size-1.5 rounded-full bg-current" aria-hidden="true" />
+    <span className={`inline-flex items-center rounded-full border px-2.5 py-1 text-caption font-medium ${className}`}>
       {label}
     </span>
   )

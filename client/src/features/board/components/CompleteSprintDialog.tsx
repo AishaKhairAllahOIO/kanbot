@@ -1,13 +1,12 @@
 import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router";
-import { getErrorMessage } from "../../../shared/api/errors";
-import type { Sprint, SprintBoardResponse } from "../../../shared/types/api";
-import { Button } from "../../../shared/components/Button";
-import { Field, SelectInput } from "../../../shared/components/Field";
-import { Modal } from "../../../shared/components/Modal";
-import { useSummarizeSprint } from "../../ai/hooks/useSummarizeSprint";
-import { AiErrorState } from "../../ai/components/AiErrorState";
-import { useCompleteSprint } from "../../sprints/hooks/useCompleteSprint";
+import { getErrorMessage } from "@/shared/api/errors";
+import type { Sprint, SprintBoardResponse } from "@/shared/types/api";
+import { Button } from "@/shared/components/Button";
+import { Modal } from "@/shared/components/Modal";
+import { useSummarizeSprint } from "@/features/ai/hooks/useSummarizeSprint";
+import { AiErrorState } from "@/features/ai/components/AiErrorState";
+import { useCompleteSprint } from "@/features/sprints/hooks/useCompleteSprint";
 
 interface CompleteSprintDialogProps {
   open: boolean;
@@ -32,8 +31,17 @@ export function CompleteSprintDialog({
   const [error, setError] = useState("");
   const [summaryError, setSummaryError] = useState("");
   const [sprintCompleted, setSprintCompleted] = useState(false);
+  const allTodos = Object.values(board.columns).flat();
   const doneCount = board.columns.done.length;
-  const notDoneCount = Object.values(board.columns).flat().length - doneCount;
+  const notDoneCount = allTodos.length - doneCount;
+  const totalPoints = allTodos.reduce(
+    (sum, todo) => sum + (todo.storyPoints ?? 0),
+    0,
+  );
+  const donePoints = board.columns.done.reduce(
+    (sum, todo) => sum + (todo.storyPoints ?? 0),
+    0,
+  );
 
   async function complete(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -90,45 +98,80 @@ export function CompleteSprintDialog({
       description="Choose where unfinished todos should go."
       size="form"
     >
-      <form className="grid gap-4" onSubmit={complete}>
-        <p className="rounded-sm bg-sunken p-3 text-body font-medium">
-          {doneCount} done, {notDoneCount} not done
-        </p>
-        <Field id="unfinished-destination" label="Move unfinished todos to">
-          <SelectInput
-            id="unfinished-destination"
-            value={moveUnfinishedTo}
-            onChange={(event) => setMoveUnfinishedTo(event.target.value)}
-          >
-            <option value="backlog">Backlog</option>
+      <form className="grid gap-5" onSubmit={complete}>
+        <div className="grid gap-1">
+          <p className="text-body font-medium text-ink">
+            {doneCount} todos done, {notDoneCount} not finished
+          </p>
+          <p className="text-small text-muted">
+            {donePoints} of {totalPoints} story points completed.
+          </p>
+        </div>
+
+        <fieldset className="grid gap-3">
+          <legend className="mb-3 text-small font-medium text-ink">
+            Move unfinished to:
+          </legend>
+          <div className="flex flex-wrap gap-x-8 gap-y-3">
+            <label className="flex items-center gap-2 text-body text-ink">
+              <input
+                type="radio"
+                name="unfinished-destination"
+                value="backlog"
+                checked={moveUnfinishedTo === "backlog"}
+                onChange={(event) => setMoveUnfinishedTo(event.target.value)}
+                className="size-4 accent-brand"
+              />
+              Backlog
+            </label>
             {plannedSprints.map((planned) => (
-              <option key={planned.id} value={planned.id}>
+              <label
+                key={planned.id}
+                className="flex items-center gap-2 text-body text-ink"
+              >
+                <input
+                  type="radio"
+                  name="unfinished-destination"
+                  value={planned.id}
+                  checked={moveUnfinishedTo === planned.id}
+                  onChange={(event) => setMoveUnfinishedTo(event.target.value)}
+                  className="size-4 accent-brand"
+                />
                 {planned.name}
-              </option>
+              </label>
             ))}
-          </SelectInput>
-        </Field>
-        <label className="flex items-start gap-2 text-small text-ink">
-          <input
-            type="checkbox"
-            checked={generateSummary}
-            disabled={sprintCompleted}
-            onChange={(event) => setGenerateSummary(event.target.checked)}
-            className="mt-0.5 size-4 accent-brand"
-          />
-          Generate AI summary
-        </label>
-        <p className="text-caption text-muted">
-          AI can make mistakes. Review before saving.
-        </p>
+          </div>
+        </fieldset>
+
+        <div className="grid gap-1 border-t border-line pt-4">
+          <label className="flex items-center gap-2 text-body text-ink">
+            <input
+              type="checkbox"
+              checked={generateSummary}
+              disabled={sprintCompleted}
+              onChange={(event) => setGenerateSummary(event.target.checked)}
+              className="size-4 accent-brand"
+            />
+            Generate AI summary
+          </label>
+          <p className="ps-6 text-caption text-muted">
+            Opens the summary in Sprints history. AI can make mistakes, review
+            before saving.
+          </p>
+        </div>
+
         {error && (
           <p role="alert" className="text-small text-danger">
             {error}
           </p>
         )}
         {summaryError && (
-          <AiErrorState message={summaryError} onRetry={() => void retrySummary()} />
+          <AiErrorState
+            message={summaryError}
+            onRetry={() => void retrySummary()}
+          />
         )}
+
         <footer className="flex justify-end gap-2 border-t border-line pt-4">
           <Button type="button" onClick={() => onOpenChange(false)}>
             Cancel

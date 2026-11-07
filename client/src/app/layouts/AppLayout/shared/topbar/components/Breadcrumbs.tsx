@@ -3,9 +3,9 @@ import { Link } from 'react-router'
 import { paths } from '@/shared/config/paths'
 import type { ProjectWithStats } from '@/shared/types/api'
 import { Skeleton } from '@/shared/components/Skeleton'
+import { prefetchRoute } from '@/app/providers/router/routeModules'
 
 interface BreadcrumbsProps {
-  /** Current page title. Rendered as the page h1. */
   title: string
   projectId?: string
   project?: ProjectWithStats
@@ -18,10 +18,6 @@ function Separator() {
   return <ChevronRight aria-hidden="true" className="size-3.5 shrink-0 text-subtle" />
 }
 
-/**
- * Projects / <project> / <page>. On small screens it shortens to <key> / <page>.
- * The last item is the current page, so it is the h1 and not a link.
- */
 export function Breadcrumbs({
   title,
   projectId,
@@ -36,7 +32,7 @@ export function Breadcrumbs({
         {projectId && (
           <>
             <li className="hidden shrink-0 sm:block">
-              <Link to={paths.projects} className="hover:text-ink">
+              <Link to={paths.projects} className="topbar-action rounded-sm hover:text-brand-ink">
                 Projects
               </Link>
             </li>
@@ -55,7 +51,7 @@ export function Breadcrumbs({
                   <span className="sr-only">Project is unavailable.</span>
                   <button
                     type="button"
-                    className="hover:underline"
+                    className="topbar-action rounded-sm hover:underline"
                     onClick={onRetryProject}
                     aria-label="Project is unavailable. Try again."
                   >
@@ -63,7 +59,12 @@ export function Breadcrumbs({
                   </button>
                 </span>
               ) : (
-                <Link to={`/projects/${projectId}/backlog`} className="hover:text-ink">
+                <Link
+                  to={`/projects/${projectId}/backlog`}
+                  onPointerEnter={() => prefetchRoute(`/projects/${projectId}/backlog`)}
+                  onFocus={() => prefetchRoute(`/projects/${projectId}/backlog`)}
+                  className="topbar-action rounded-sm hover:text-brand-ink"
+                >
                   <span className="sm:hidden">{project.key}</span>
                   <span className="hidden sm:inline">{project.name}</span>
                 </Link>

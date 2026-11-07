@@ -1,5 +1,6 @@
-import { useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useEffect, useState } from 'react'
+import { Controller, useForm } from 'react-hook-form'
+import { CircleAlert } from 'lucide-react'
 import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { Sprint } from '../../../shared/types/api'
@@ -7,6 +8,7 @@ import { ApiError, fieldErrors } from '../../../shared/api/client'
 import { getErrorMessage } from '../../../shared/api/errors'
 import { Button } from '../../../shared/components/Button'
 import { Field, TextArea, TextInput } from '../../../shared/components/Field'
+import { DatePickerInput } from '../../../shared/components/DatePickerInput'
 import { Modal } from '../../../shared/components/Modal'
 import { useCreateSprint } from '../hooks/useCreateSprint'
 import { useUpdateSprint } from '../hooks/useUpdateSprint'
@@ -39,8 +41,10 @@ export function SprintFormDialog({ open, projectId, sprint, onOpenChange }: Spri
     const update = useUpdateSprint(projectId)
 
   const [formError, setFormError] = useState('')
+  const isEditing = Boolean(sprint)
   const {
     register,
+    control,
     handleSubmit,
     reset,
     setError,
@@ -51,15 +55,7 @@ export function SprintFormDialog({ open, projectId, sprint, onOpenChange }: Spri
   })
 
   function handleOpenChange(nextOpen: boolean) {
-    if (nextOpen) {
-    reset({
-      name: sprint?.name ?? '',
-      goal: sprint?.goal ?? '',
-      startDate: sprint?.startDate ?? (sprint ? '' : calculateSprintDatesFromTemplate(projectId).startDate),
-      endDate: sprint?.endDate ?? (sprint ? '' : calculateSprintDatesFromTemplate(projectId).endDate),
-    })
-    setFormError('')
-    }
+    if (!nextOpen) setFormError('')
     onOpenChange(nextOpen)
   }
 
@@ -98,6 +94,17 @@ export function SprintFormDialog({ open, projectId, sprint, onOpenChange }: Spri
   }
 
   const isPending = create.isPending || update.isPending
+  const dateError = errors.startDate?.message ?? errors.endDate?.message
+
+  useEffect(() => {
+    if (!open) return
+    reset({
+      name: sprint?.name ?? '',
+      goal: sprint?.goal ?? '',
+      startDate: sprint?.startDate ?? (isEditing ? '' : calculateSprintDatesFromTemplate(projectId).startDate),
+      endDate: sprint?.endDate ?? (isEditing ? '' : calculateSprintDatesFromTemplate(projectId).endDate),
+    })
+  }, [open, projectId, reset, sprint?.id, sprint?.name, sprint?.goal, sprint?.startDate, sprint?.endDate, isEditing])
 
   return (
     <Modal
@@ -115,13 +122,50 @@ export function SprintFormDialog({ open, projectId, sprint, onOpenChange }: Spri
           <TextArea id="sprint-goal" rows={3} invalid={Boolean(errors.goal)} {...register('goal')} />
         </Field>
         <div className="grid gap-4 sm:grid-cols-2">
-          <Field id="sprint-start-date" label="Start date" optional error={errors.startDate?.message}>
-            <TextInput id="sprint-start-date" type="date" invalid={Boolean(errors.startDate)} {...register('startDate')} />
+          <Field id="sprint-start-date" label="Start date" optional>
+            <Controller
+              control={control}
+              name="startDate"
+              render={({ field }) => (
+                <DatePickerInput
+                  id="sprint-start-date"
+                  value={field.value}
+                  invalid={Boolean(errors.startDate)}
+                  aria-describedby={dateError ? 'sprint-dates-error' : undefined}
+                  onValueChange={field.onChange}
+                />
+              )}
+            />
           </Field>
-          <Field id="sprint-end-date" label="End date" optional error={errors.endDate?.message}>
-            <TextInput id="sprint-end-date" type="date" invalid={Boolean(errors.endDate)} {...register('endDate')} />
+          <Field id="sprint-end-date" label="End date" optional>
+            <Controller
+              control={control}
+              name="endDate"
+              render={({ field }) => (
+                <DatePickerInput
+                  id="sprint-end-date"
+                  value={field.value}
+                  invalid={Boolean(errors.endDate)}
+                  aria-describedby={dateError ? 'sprint-dates-error' : undefined}
+                  onValueChange={field.onChange}
+                />
+              )}
+            />
           </Field>
         </div>
+        <p
+          id="sprint-dates-error"
+          role={dateError ? 'alert' : undefined}
+          aria-live="polite"
+          className="flex min-h-8 items-start gap-1 text-small text-danger"
+        >
+          {dateError && (
+            <>
+              <CircleAlert aria-hidden="true" className="mt-0.5 size-4 shrink-0" />
+              <span>{dateError}</span>
+            </>
+          )}
+        </p>
         <footer className="flex justify-end gap-2 border-t border-line pt-4">
           <Button type="button" onClick={() => handleOpenChange(false)}>Cancel</Button>
           <Button type="submit" variant="primary" loading={isPending}>{sprint ? 'Save changes' : 'Create sprint'}</Button>

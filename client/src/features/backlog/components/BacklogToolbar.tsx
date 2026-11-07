@@ -3,27 +3,23 @@ import type { Dispatch, SetStateAction } from 'react'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import * as Popover from '@radix-ui/react-popover'
 import {
-  Bookmark,
-  Bug,
   Check,
   ChevronDown,
-  ChevronsUp,
-  ChevronUp,
   Download,
-  Equal,
   Filter,
   Layers,
   Plus,
   Search,
   Settings2,
-  Sparkles,
-  SquareCheck,
+  Bot,
   Tag,
-  WandSparkles,
   X,
 } from 'lucide-react'
-import type { TodoPriority, TodoType } from '../../../shared/types/api'
-import { Button } from '../../../shared/components/Button'
+import type { TodoPriority, TodoType } from '@/shared/types/api'
+import { Button } from '@/shared/components/Button'
+import { Tooltip } from '@/shared/components/Tooltip'
+import { TODO_PRIORITIES, TODO_TYPES } from '@/shared/types/api'
+import { priorityConfig, typeConfig } from '@/features/todos/config/todoConfig'
 
 type FilterCategory = 'type' | 'priority' | 'labels'
 
@@ -33,18 +29,15 @@ const FILTER_CATEGORIES: { id: FilterCategory; label: string; icon: typeof Layer
   { id: 'labels', label: 'Labels', icon: Tag },
 ]
 
-const PRIORITY_OPTIONS: { value: TodoPriority; label: string; color: string; icon: typeof ChevronDown }[] = [
-  { value: 'urgent', label: 'Urgent', color: 'text-priority-urgent', icon: ChevronsUp },
-  { value: 'high', label: 'High', color: 'text-priority-high', icon: ChevronUp },
-  { value: 'medium', label: 'Medium', color: 'text-priority-medium', icon: Equal },
-  { value: 'low', label: 'Low', color: 'text-priority-low', icon: ChevronDown },
-]
+const PRIORITY_OPTIONS = [...TODO_PRIORITIES].reverse().map((value) => ({
+  value,
+  ...priorityConfig[value],
+}))
 
-const TYPE_OPTIONS: { value: TodoType; label: string; color: string; icon: typeof SquareCheck }[] = [
-  { value: 'task', label: 'Task', color: 'text-type-task', icon: SquareCheck },
-  { value: 'story', label: 'Story', color: 'text-type-story', icon: Bookmark },
-  { value: 'bug', label: 'Bug', color: 'text-type-bug', icon: Bug },
-]
+const TYPE_OPTIONS = TODO_TYPES.map((value) => ({
+  value,
+  ...typeConfig[value],
+}))
 
 interface BacklogToolbarProps {
   search: string
@@ -127,19 +120,19 @@ export function BacklogToolbar({
       <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
         <label className="relative min-w-48 flex-1 sm:max-w-xs">
           <span className="sr-only">Search todos</span>
-          <Search aria-hidden="true" className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-muted" />
+          <Search aria-hidden="true" className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-brand-ink" />
           <input
             data-shortcut-search
             type="search"
             value={search}
             onChange={(event) => setSearch(event.currentTarget.value)}
             placeholder="Search todos..."
-            className="h-9 w-full rounded-sm border border-line-strong bg-surface ps-9 pe-12 text-body text-ink shadow-card placeholder:text-subtle transition-colors focus:border-brand focus:outline-none focus:ring-2 focus:ring-focus/20"
+            className="h-10 w-full rounded-sm  border-line bg-surface ps-9 pe-3 text-body text-ink placeholder:text-subtle"
           />
           <kbd dir="ltr" className="pointer-events-none absolute end-2 top-1/2 -translate-y-1/2 rounded-xs border border-line bg-sunken px-1.5 py-0.5 font-mono text-caption text-muted">
             /
           </kbd>
-        </label>
+         </label>
 
         <Popover.Root open={filterOpen} onOpenChange={handleFilterOpenChange}>
           <Popover.Trigger asChild>
@@ -152,14 +145,14 @@ export function BacklogToolbar({
                   : 'border-line-strong bg-surface text-ink hover:bg-sunken'
               }`}
             >
-              <Filter aria-hidden="true" className="size-4" />
+              <Filter aria-hidden="true" className="size-4 text-brand-ink" />
               Filter
               {activeFilterCount > 0 && (
                 <span className="grid size-5 place-content-center rounded-full bg-brand text-caption font-semibold text-on-brand">
                   {activeFilterCount}
                 </span>
               )}
-              <ChevronDown aria-hidden="true" className={`size-3.5 transition-transform ${filterOpen ? 'rotate-180' : ''}`} />
+              <ChevronDown aria-hidden="true" className={`size-3.5 text-brand-ink transition-transform ${filterOpen ? 'rotate-180' : ''}`} />
             </button>
           </Popover.Trigger>
           <Popover.Portal>
@@ -211,7 +204,7 @@ export function BacklogToolbar({
                         <span className={`grid size-4 place-content-center rounded-xs border ${selected ? 'border-brand bg-brand text-on-brand' : 'border-line-strong bg-surface'}`}>
                           {selected && <Check aria-hidden="true" className="size-3" />}
                         </span>
-                        <Icon aria-hidden="true" className={`size-4 ${option.color}`} />
+                        <Icon aria-hidden="true" className={`size-4 ${option.className}`} />
                         <span>{option.label}</span>
                       </button>
                     )
@@ -230,7 +223,7 @@ export function BacklogToolbar({
                         <span className={`grid size-4 place-content-center rounded-xs border ${selected ? 'border-brand bg-brand text-on-brand' : 'border-line-strong bg-surface'}`}>
                           {selected && <Check aria-hidden="true" className="size-3" />}
                         </span>
-                        <Icon aria-hidden="true" className={`size-4 ${option.color}`} />
+                        <Icon aria-hidden="true" className={`size-4 ${option.className}`} />
                         <span>{option.label}</span>
                       </button>
                     )
@@ -298,63 +291,68 @@ export function BacklogToolbar({
             <Button
               size="sm"
               variant="secondary"
-              leadingIcon={<Download aria-hidden="true" className="size-3.5" />}
+              leadingIcon={<Download aria-hidden="true" className="size-3.5 text-brand-ink" />}
             >
               Export
-              <ChevronDown aria-hidden="true" className="size-3.5" />
+              <ChevronDown aria-hidden="true" className="size-3.5 text-brand-ink" />
             </Button>
           </DropdownMenu.Trigger>
           <DropdownMenu.Portal>
             <DropdownMenu.Content
               align="end"
               sideOffset={4}
-              className="z-popover min-w-40 rounded-md border border-line bg-raised p-1 shadow-pop"
+              className="z-popover w-[var(--radix-dropdown-menu-trigger-width)] max-w-[var(--radix-dropdown-menu-content-available-width)] rounded-md border border-line bg-raised p-1 shadow-pop"
             >
               <DropdownMenu.Item className="menu-item" onSelect={onExportCsv}>
-                Export as CSV
+                CSV
               </DropdownMenu.Item>
               <DropdownMenu.Item className="menu-item" onSelect={onExportMarkdown}>
-                Export as Markdown
+                Markdown
               </DropdownMenu.Item>
             </DropdownMenu.Content>
           </DropdownMenu.Portal>
         </DropdownMenu.Root>
 
-        <Button
-          size="sm"
-          variant="secondary"
-          onClick={onOpenSprintTemplate}
-          leadingIcon={<Settings2 aria-hidden="true" className="size-3.5" />}
-          title="Configure default sprint duration and capacity"
-        >
-          Templates
-        </Button>
+        <Tooltip content="Configure default sprint duration and capacity">
+          <Button
+            size="sm"
+            variant="secondary"
+            onClick={onOpenSprintTemplate}
+            leadingIcon={<Settings2 aria-hidden="true" className="size-3.5 text-brand-ink" />}
+          >
+            Templates
+          </Button>
+        </Tooltip>
 
         <DropdownMenu.Root>
-          <DropdownMenu.Trigger asChild>
-            <Button
-              size="sm"
-              variant="secondary"
-              leadingIcon={<Sparkles aria-hidden="true" className="size-3.5 text-brand-ink" />}
-            >
-              AI actions
-              <ChevronDown aria-hidden="true" className="size-3.5" />
-            </Button>
-          </DropdownMenu.Trigger>
+          <Tooltip content="Generate todos or plan a sprint with AI">
+            <DropdownMenu.Trigger asChild>
+              <Button
+                size="sm"
+                variant="secondary"
+                leadingIcon={<Bot aria-hidden="true" className="size-3.5 text-brand-ink" />}
+              >
+                AI actions
+                <ChevronDown aria-hidden="true" className="size-3.5 text-brand-ink" />
+              </Button>
+            </DropdownMenu.Trigger>
+          </Tooltip>
           <DropdownMenu.Portal>
             <DropdownMenu.Content
               align="end"
               sideOffset={4}
-              className="z-popover min-w-48 rounded-md border border-line bg-raised p-1 shadow-pop"
+              className="z-popover w-[var(--radix-dropdown-menu-trigger-width)] max-w-[var(--radix-dropdown-menu-content-available-width)] rounded-md border border-line bg-raised p-1 shadow-pop"
             >
-              <DropdownMenu.Item className="menu-item" onSelect={onGenerate}>
-                <WandSparkles aria-hidden="true" className="size-4 text-brand-ink" />
-                Generate todos
-              </DropdownMenu.Item>
-              <DropdownMenu.Item className="menu-item" onSelect={onPlanSprint}>
-                <Sparkles aria-hidden="true" className="size-4 text-brand-ink" />
-                Plan sprint
-              </DropdownMenu.Item>
+              <Tooltip content="Generate suggested todos from a feature description">
+                <DropdownMenu.Item className="menu-item" onSelect={onGenerate}>
+                  Generate todos
+                </DropdownMenu.Item>
+              </Tooltip>
+              <Tooltip content="Create an AI-recommended sprint plan">
+                <DropdownMenu.Item className="menu-item" onSelect={onPlanSprint}>
+                  Plan sprint
+                </DropdownMenu.Item>
+              </Tooltip>
             </DropdownMenu.Content>
           </DropdownMenu.Portal>
         </DropdownMenu.Root>

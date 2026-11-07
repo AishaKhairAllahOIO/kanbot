@@ -11,15 +11,14 @@ export const PROJECTS_NAV_ITEM: NavigationItem = {
   end: true,
 }
 
-/** Backlog / Active Sprint / Sprints. Locked while no project is in the route. */
 export function useProjectNavItems(projectId?: string): NavigationItem[] {
   return useMemo(() => {
     const enabled = Boolean(projectId)
     const to = (segment: string) => (projectId ? `/projects/${projectId}/${segment}` : paths.projects)
     return [
       { to: to('backlog'), label: 'Backlog', icon: ListTodo, enabled },
-      { to: to('board'), label: 'Active Sprint', icon: PanelsTopLeft, enabled },
-      { to: to('sprints'), label: 'Sprints', icon: History, enabled },
+      { to: to('board'), label: 'Board', icon: PanelsTopLeft, enabled },
+      { to: to('sprints'), label: 'Sprints History', icon: History, enabled },
     ]
   }, [projectId])
 }

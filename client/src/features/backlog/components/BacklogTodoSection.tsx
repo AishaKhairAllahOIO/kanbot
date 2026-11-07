@@ -1,14 +1,17 @@
-import { ArrowDown, ChevronDown, ChevronRight, ListTodo } from 'lucide-react'
+import { ArrowDown, ArrowUp, ListTodo } from 'lucide-react'
 import { useDroppable } from '@dnd-kit/core'
 import { useCallback, useEffect, useRef, useState } from 'react'
-import type { MoveTodoRequest, Sprint, Todo } from '../../../shared/types/api'
-import { Button } from '../../../shared/components/Button'
-import { EmptyState } from '../../../shared/components/EmptyState'
-import { Skeleton } from '../../../shared/components/Skeleton'
-import { QuickCreateTodo } from '../../todos/components/QuickCreateTodo'
-import { SortableTodoList } from '../../todos/components/SortableTodoList'
+import type { MoveTodoRequest, Sprint, Todo } from '@/shared/types/api'
+import { Button } from '@/shared/components/Button'
+import { EmptyState } from '@/shared/components/EmptyState'
+import { Skeleton } from '@/shared/components/Skeleton'
+import { QuickCreateTodo } from '@/features/todos/components/QuickCreateTodo'
+import { SortableTodoList } from '@/features/todos/components/SortableTodoList'
+import { CollapsibleSectionHeader } from './CollapsibleSectionHeader'
+import { useUiPreferencesStore } from '@/app/stores/uiPreferencesStore'
 
 interface BacklogTodoSectionProps {
+  highlightedTodoIds?: ReadonlySet<string>
   projectId: string
   todos: Todo[]
   totalTodos: number
@@ -28,6 +31,7 @@ interface BacklogTodoSectionProps {
 }
 
 export function BacklogTodoSection({
+  highlightedTodoIds,
   projectId,
   todos,
   totalTodos,
@@ -45,8 +49,13 @@ export function BacklogTodoSection({
   onDeleteTodo,
   onGenerateTodos,
 }: BacklogTodoSectionProps) {
-  const [expanded, setExpanded] = useState(true)
-  const [canScrollDown, setCanScrollDown] = useState(false)
+  const sectionKey = `backlog:${projectId}:todos`
+  const isCollapsed = useUiPreferencesStore(
+    (state) => state.collapsedSections[sectionKey] ?? false,
+  )
+  const toggleCollapsed = useUiPreferencesStore((state) => state.toggleCollapsed)
+  const expanded = !isCollapsed
+  const [scrollEdges, setScrollEdges] = useState({ top: false, bottom: false })
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const scrollContentRef = useRef<HTMLDivElement>(null)
   const itemIds = todos.map((todo) => todo.id)
@@ -59,8 +68,11 @@ export function BacklogTodoSection({
   const updateScrollCue = useCallback(() => {
     const container = scrollContainerRef.current
     if (!container) return
-    const hasMoreContent = container.scrollHeight > container.clientHeight + container.scrollTop + 8
-    setCanScrollDown((current) => current === hasMoreContent ? current : hasMoreContent)
+    const top = container.scrollTop > 8
+    const bottom = container.scrollHeight > container.clientHeight + container.scrollTop + 8
+    setScrollEdges((current) =>
+      current.top === top && current.bottom === bottom ? current : { top, bottom },
+    )
   }, [])
 
   useEffect(() => {
@@ -81,21 +93,66 @@ export function BacklogTodoSection({
     }
   }, [expanded, todos.length, updateScrollCue])
 
+  useEffect(() => {
+    if (!highlightedTodoIds?.size || !expanded) return
+
+    const container = scrollContainerRef.current
+    if (!container) return
+
+    const addedRows = Array.from(
+      container.querySelectorAll<HTMLElement>('[data-todo-id]'),
+    ).filter((row) => highlightedTodoIds.has(row.dataset.todoId ?? ''))
+    if (addedRows.length === 0) return
+
+    const containerRect = container.getBoundingClientRect()
+    const firstRowRect = addedRows[0].getBoundingClientRect()
+    const lastRowRect = addedRows[addedRows.length - 1].getBoundingClientRect()
+    const firstRowTop = firstRowRect.top - containerRect.top + container.scrollTop
+    const lastRowBottom = lastRowRect.bottom - containerRect.top + container.scrollTop
+    const visibleTop = container.scrollTop
+    const visibleBottom = visibleTop + container.clientHeight
+    let targetScrollTop: number | undefined
+
+    if (lastRowBottom - firstRowTop > container.clientHeight) {
+      targetScrollTop = firstRowTop
+    } else if (firstRowTop < visibleTop) {
+      targetScrollTop = firstRowTop
+    } else if (lastRowBottom > visibleBottom) {
+      targetScrollTop = lastRowBottom - container.clientHeight
+    }
+
+    if (targetScrollTop !== undefined) {
+      container.scrollTo({
+        top: targetScrollTop,
+        behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches
+          ? 'instant'
+          : 'smooth',
+      })
+    }
+  }, [expanded, highlightedTodoIds, todos])
+
   return (
     <section
+      id="backlog-todos-section"
       ref={setNodeRef}
       className={`theme-card mt-5 overflow-hidden rounded-md border-s-2 border-s-brand ${isOver ? 'bg-sunken/50 outline outline-1 outline-line-strong outline-offset-1' : ''}`}
     >
-      <div className="flex min-h-12 w-full items-center justify-between border-b border-line bg-brand-soft/50 px-3">
-        <button
-          type="button"
-          aria-expanded={expanded}
-          onClick={() => setExpanded((value) => !value)}
-          className="flex min-h-12 flex-1 items-center gap-2 text-left transition-colors hover:text-brand-ink"
-        >
-          {expanded
-            ? <ChevronDown aria-hidden="true" className="size-4 text-brand-ink" />
-            : <ChevronRight aria-hidden="true" className="size-4 text-brand-ink" />}
+      <CollapsibleSectionHeader
+        variant="backlog"
+        expanded={expanded}
+        onToggle={() => toggleCollapsed(sectionKey)}
+        actions={onToggleSelectAll && todos.length > 0 && expanded ? (
+          <label className="flex cursor-pointer items-center gap-1.5 rounded-sm px-2 py-1 text-caption text-muted">
+            <input
+              type="checkbox"
+              checked={isAllSelected}
+              onChange={onToggleSelectAll}
+              className="size-3.5 rounded-sm border-line-strong accent-brand"
+            />
+            <span>Select all</span>
+          </label>
+        ) : undefined}
+      >
           <span className="grid size-7 shrink-0 place-content-center rounded-sm bg-brand-soft text-brand-ink">
             <ListTodo aria-hidden="true" className="size-4" />
           </span>
@@ -108,20 +165,7 @@ export function BacklogTodoSection({
               <>{totalTodos} todos · {totalPoints} pts</>
             )}
           </span>
-        </button>
-
-        {onToggleSelectAll && todos.length > 0 && expanded && (
-          <label className="flex cursor-pointer items-center gap-1.5 rounded-sm px-2 py-1 text-caption text-muted transition-colors hover:bg-surface hover:text-ink">
-            <input
-              type="checkbox"
-              checked={isAllSelected}
-              onChange={onToggleSelectAll}
-              className="size-3.5 rounded-xs border-line-strong accent-info focus:ring-info"
-            />
-            <span>Select all</span>
-          </label>
-        )}
-      </div>
+      </CollapsibleSectionHeader>
 
       {expanded && (
         <>
@@ -144,7 +188,7 @@ export function BacklogTodoSection({
             </div>
           ) : (
             <div className="relative">
-              <div ref={scrollContainerRef} className="max-h-[20rem] overflow-y-auto" aria-label="Backlog todos">
+              <div ref={scrollContainerRef} className="scrollbar-hidden max-h-[20rem] overflow-y-auto" aria-label="Backlog todos">
                 <div ref={scrollContentRef}>
                   <SortableTodoList
                     todos={todos}
@@ -153,6 +197,7 @@ export function BacklogTodoSection({
                     listId="backlog"
                     manageDragContext={false}
                     isSelected={isSelected}
+                    highlightedTodoIds={highlightedTodoIds}
                     onToggleSelect={onToggleSelect}
                     onOpen={onOpenTodo}
                     onMove={onMoveTodo}
@@ -160,12 +205,24 @@ export function BacklogTodoSection({
                   />
                 </div>
               </div>
-              {canScrollDown && (
+              {scrollEdges.top && (
+                <div className="pointer-events-none absolute inset-x-0 top-0 flex h-12 items-start justify-center bg-gradient-to-b from-surface via-surface/90 to-transparent pt-1">
+                  <button
+                    type="button"
+                    aria-label="Scroll backlog up"
+                    onClick={() => scrollContainerRef.current?.scrollBy({ top: -44, behavior: 'smooth' })}
+                    className="pointer-events-auto grid size-8 place-content-center rounded-full border border-line bg-surface text-brand-ink shadow-card transition-colors hover:bg-brand-soft"
+                  >
+                    <ArrowUp aria-hidden="true" className="size-4" />
+                  </button>
+                </div>
+              )}
+              {scrollEdges.bottom && (
                 <div className="pointer-events-none absolute inset-x-0 bottom-0 flex h-12 items-end justify-center bg-gradient-to-t from-surface via-surface/90 to-transparent pb-1">
                   <button
                     type="button"
                     aria-label="Scroll backlog down"
-                    onClick={() => scrollContainerRef.current?.scrollBy({ top: 180, behavior: 'smooth' })}
+                    onClick={() => scrollContainerRef.current?.scrollBy({ top: 44, behavior: 'smooth' })}
                     className="pointer-events-auto grid size-8 place-content-center rounded-full border border-line bg-surface text-brand-ink shadow-card transition-colors hover:bg-brand-soft"
                   >
                     <ArrowDown aria-hidden="true" className="size-4" />

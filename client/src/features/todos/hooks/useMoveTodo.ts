@@ -22,12 +22,14 @@ export function useMoveTodo(projectId: string) {
     meta: { handledInline: true },
 
     onMutate: async ({ todoId, body }) => {
-      await queryClient.cancelQueries({ queryKey: queryKeys.todos.all(projectId) })
+      await Promise.all([
+        queryClient.cancelQueries({ queryKey: queryKeys.todos.all(projectId) }),
+        queryClient.cancelQueries({ queryKey: queryKeys.sprints.boards }),
+      ])
       const snapshots = queryClient.getQueriesData<{ todos: Todo[] }>({
         queryKey: queryKeys.todos.all(projectId),
       })
 
-      await queryClient.cancelQueries({ queryKey: queryKeys.sprints.boards})
       const boardSnapshots = queryClient.getQueriesData<SprintBoardResponse>({
         queryKey: queryKeys.sprints.boards,
       })
@@ -95,7 +97,7 @@ export function useMoveTodo(projectId: string) {
         })
       }
 
-      return { snapshots, boardSnapshots }
+      return { snapshots, boardSnapshots, originalTodo }
     },
 
     onError: (error, _variables, context) => {
@@ -106,7 +108,30 @@ export function useMoveTodo(projectId: string) {
       showToast(`${message} The change was undone.`, 'error')
     },
 
-    onSuccess: () => showToast('Todo moved'),
+    onSuccess: (_data, variables, context) => {
+      if (!context?.originalTodo) {
+        showToast('Todo moved')
+        return
+      }
+      const originalTodo = context.originalTodo
+      showToast('Todo moved', 'success', {
+        label: 'Undo',
+        onClick: () => {
+          void todosApi.move(variables.todoId, {
+            sprintId: originalTodo.sprintId,
+            status: originalTodo.status,
+            position: originalTodo.order,
+          })
+            .then(() => Promise.all([
+              queryClient.invalidateQueries({ queryKey: queryKeys.todos.all(projectId) }),
+              queryClient.invalidateQueries({ queryKey: queryKeys.sprints.boards }),
+              queryClient.invalidateQueries({ queryKey: queryKeys.sprints.list(projectId) }),
+              queryClient.invalidateQueries({ queryKey: queryKeys.projects.all }),
+            ]))
+            .catch((error: unknown) => showToast(getErrorMessage(error), 'error'))
+        },
+      })
+    },
 
     onSettled: async (_data, _error, variables) => {
       await Promise.all([

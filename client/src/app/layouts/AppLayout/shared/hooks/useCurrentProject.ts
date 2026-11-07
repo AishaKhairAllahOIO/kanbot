@@ -11,7 +11,7 @@ export function useCurrentProject() {
   return {
     projects,
     project,
-    projectsLoading: projectsQuery.isPending,
+    projectsLoading: projectsQuery.isLoading,
     projectsError: projectsQuery.isError,
     retryProjects: projectsQuery.refetch,
   }
