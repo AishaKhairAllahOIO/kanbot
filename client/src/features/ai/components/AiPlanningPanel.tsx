@@ -98,6 +98,15 @@ export function AiPlanningPanel({
                       Mock AI
                     </span>
                   )}
+                  {statusQuery.data?.mode === 'ai' && statusQuery.data.model && (
+                    <span
+                      title={`AI model: ${statusQuery.data.model}`}
+                      aria-label={`AI model: ${statusQuery.data.model}`}
+                      className="max-w-48 truncate rounded-xs border border-brand-soft-line bg-brand-soft px-1.5 py-0.5 text-caption text-brand-ink"
+                    >
+                      {statusQuery.data.model}
+                    </span>
+                  )}
                 </div>
                 <Dialog.Description className="text-small leading-4 text-muted">
                   Chat, generate todos, plan, or summarize
