@@ -4,7 +4,6 @@ import {
   Copy,
   Mail,
   Upload,
-  UserRound,
   X,
 } from "lucide-react";
 import { useAuth } from "@/app/hooks/useAuth";
