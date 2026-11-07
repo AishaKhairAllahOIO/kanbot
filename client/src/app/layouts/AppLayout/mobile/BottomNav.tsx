@@ -6,7 +6,7 @@ import {
   useProjectNavItems,
 } from "../shared/hooks/useProjectNavItems";
 import { prefetchRoute } from "../../../providers/router/routeModules";
-import { DailyFocusButton } from "../desktop/sidebar/components/DailyFocusButton";
+import { Tooltip } from "@/shared/components/Tooltip";
 
 const ITEM =
   "relative flex min-h-11 flex-1 flex-col items-center justify-center gap-0.5 text-nav font-medium transition-colors";
@@ -19,27 +19,28 @@ export function BottomNav() {
   return (
     <nav
       aria-label="Mobile navigation"
-      className="fixed inset-x-0 bottom-0 z-sticky box-content h-[var(--bottom-nav-h)] items-stretch border-t border-line bg-surface pb-[env(safe-area-inset-bottom)] md:hidden flex"
+      className="fixed inset-x-0 bottom-0 z-sticky box-content h-[var(--bottom-nav-height)] items-stretch border-t border-line bg-surface pb-[env(safe-area-inset-bottom)] md:hidden flex"
     >
       {items.map((item) => {
         const Icon = item.icon;
 
         if (!item.enabled) {
           return (
-            <button
-              key={item.label}
-              type="button"
-              aria-disabled="true"
-              aria-describedby="select-project-hint"
-              className={`${ITEM} cursor-not-allowed text-muted opacity-70`}
-            >
-              <Icon aria-hidden="true" className="size-5 shrink-0" />
-              <span>{item.label}</span>
-              <Lock
-                aria-hidden="true"
-                className="absolute right-[calc(50%-1.5rem)] top-2 size-3"
-              />
-            </button>
+            <Tooltip key={item.label} content={`Select a project to open ${item.label}`}>
+              <button
+                type="button"
+                aria-disabled="true"
+                aria-describedby="select-project-hint"
+                className={`${ITEM} cursor-not-allowed text-muted opacity-70`}
+              >
+                <Icon aria-hidden="true" className="size-5 shrink-0" />
+                <span>{item.label}</span>
+                <Lock
+                  aria-hidden="true"
+                  className="absolute right-[calc(50%-1.5rem)] top-2 size-3"
+                />
+              </button>
+            </Tooltip>
           );
         }
 
@@ -48,10 +49,11 @@ export function BottomNav() {
             key={item.label}
             to={item.to}
             end={item.end}
+            title={item.label}
             onPointerEnter={() => prefetchRoute(item.to)}
             onFocus={() => prefetchRoute(item.to)}
             className={({ isActive }) =>
-              `${ITEM} ${isActive ? "text-brand-ink" : "text-muted hover:text-ink"}`
+              `${ITEM} ${isActive || (item.label === "Projects" && !projectId) ? "text-brand-ink" : "text-muted hover:text-ink"}`
             }
           >
             <Icon aria-hidden="true" className="size-5 shrink-0" />
@@ -61,10 +63,6 @@ export function BottomNav() {
       })}
       <StarredProjectsMenu
         side="top"
-        showLabel
-        className={`${ITEM} text-muted hover:text-ink`}
-      />
-      <DailyFocusButton
         showLabel
         className={`${ITEM} text-muted hover:text-ink`}
       />

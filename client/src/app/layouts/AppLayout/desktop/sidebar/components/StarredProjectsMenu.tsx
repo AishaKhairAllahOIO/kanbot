@@ -1,6 +1,7 @@
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import { Star } from 'lucide-react'
 import { Link } from 'react-router'
+import { Tooltip } from '@/shared/components/Tooltip'
 import { useCurrentProject } from '../../../shared/hooks/useCurrentProject'
 import { useStarredProjects } from '../hooks/useStarredProjects'
 import { prefetchRoute } from '../../../../../providers/router/routeModules'
@@ -22,12 +23,14 @@ export function StarredProjectsMenu({
 
   return (
     <DropdownMenu.Root>
-      <DropdownMenu.Trigger asChild>
-        <button type="button" aria-label="Starred projects" title="Starred projects" className={className}>
-          <Star aria-hidden="true" className="size-5 shrink-0" />
-          {showLabel && <span>Starred</span>}
-        </button>
-      </DropdownMenu.Trigger>
+      <Tooltip content="Starred projects">
+        <DropdownMenu.Trigger asChild>
+          <button type="button" aria-label="Starred projects" className={className}>
+            <Star aria-hidden="true" className="size-5 shrink-0" />
+            {showLabel && <span>Starred</span>}
+          </button>
+        </DropdownMenu.Trigger>
+      </Tooltip>
       <DropdownMenu.Portal>
         <DropdownMenu.Content
           align="center"

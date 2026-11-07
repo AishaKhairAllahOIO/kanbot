@@ -72,10 +72,10 @@ export function BurndownChart({ sprint, todos }: BurndownChartProps) {
         </div>
       </div>
 
-      <div className="relative w-full overflow-x-auto">
+      <div className="relative w-full min-w-0">
         <svg
           viewBox={`0 0 ${svgWidth} ${svgHeight}`}
-          className="h-56 w-full min-w-[500px]"
+          className="h-56 w-full"
           aria-label="Burndown chart"
         >
           {/* Horizontal grid lines & Y labels */}

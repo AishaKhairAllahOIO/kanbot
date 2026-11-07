@@ -82,19 +82,19 @@ export function MyWeekSection() {
           action={<Button onClick={() => void refetch()}>Try again</Button>}
         />
       ) : isLoading ? (
-        <div className="grid grid-cols-7 gap-2 overflow-x-auto pb-1" role="status" aria-label="Loading weekly activity">
+        <div className="grid grid-cols-7 gap-1 pb-1 sm:gap-3" role="status" aria-label="Loading weekly activity">
           {days.map((day) => (
-            <div key={day.dateKey} className="grid justify-items-center gap-2">
-              <Skeleton className="size-14 rounded-xl" />
-              <Skeleton className="h-3 w-8" />
+            <div key={day.dateKey} className="grid min-w-0 justify-items-center gap-2">
+              <Skeleton className="aspect-square w-full max-w-14 rounded-xl" />
+              <Skeleton className="h-3 w-full max-w-8" />
               <Skeleton className="h-3 w-4" />
             </div>
           ))}
         </div>
       ) : (
         <>
-          <div className="overflow-x-auto pb-1">
-            <div className="grid min-w-[28rem] grid-cols-7 gap-2 sm:gap-3">
+          <div className="min-w-0 pb-1">
+            <div className="grid min-w-0 grid-cols-7 gap-1 sm:gap-3">
               {days.map((day) => {
                 const isToday = day.dateKey === todayKey
                 const isSelected = day.dateKey === selectedDayKey
@@ -105,17 +105,17 @@ export function MyWeekSection() {
                     aria-label={`${getMyWeekDayLabel(day.date)}: ${day.todos.length} completed ${day.todos.length === 1 ? 'todo' : 'todos'}${isToday ? ', today' : ''}`}
                     aria-pressed={isSelected}
                     onClick={() => setSelectedDayKey(day.dateKey)}
-                    className="group grid justify-items-center gap-1 rounded-md text-center outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
+                    className="group grid min-w-0 justify-items-center gap-1 rounded-md text-center outline-none focus-visible:ring-2 focus-visible:ring-focus focus-visible:ring-offset-2 focus-visible:ring-offset-surface"
                   >
                     <span
-                      className={`grid size-14 place-content-center rounded-xl border border-line/60 text-body font-semibold tabular-nums transition-shadow ${
+                      className={`grid aspect-square w-full max-w-14 place-content-center rounded-lg border border-line/60 text-caption font-semibold tabular-nums transition-shadow sm:rounded-xl sm:text-body ${
                         isSelected ? 'ring-2 ring-brand ring-offset-2 ring-offset-surface' : ''
                       } ${day.level >= 3 ? 'text-white' : 'text-ink'}`}
                       style={{ background: levelBackgrounds[day.level] }}
                     >
                       {day.todos.length}
                     </span>
-                    <span className={`text-caption ${isToday ? 'font-semibold text-brand-ink' : 'text-muted'}`}>
+                    <span className={`text-[10px] sm:text-caption ${isToday ? 'font-semibold text-brand-ink' : 'text-muted'}`}>
                       {format(day.date, 'EEE')}
                     </span>
                     <span className={`text-caption tabular-nums ${isToday ? 'font-semibold text-brand-ink' : 'text-subtle'}`}>

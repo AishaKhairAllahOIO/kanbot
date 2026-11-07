@@ -117,8 +117,8 @@ export function BacklogToolbar({
 
   return (
     <div className="page-gutter flex flex-col gap-3 border-b border-line bg-canvas py-3 xl:flex-row xl:items-center xl:justify-between">
-      <div className="flex min-w-0 flex-1 flex-wrap items-center gap-2">
-        <label className="relative min-w-48 flex-1 sm:max-w-xs">
+      <div className="grid min-w-0 flex-1 grid-cols-[minmax(0,1fr)_auto] items-center gap-2 sm:flex sm:flex-wrap">
+        <label className="relative col-span-2 min-w-0 sm:col-span-1 sm:min-w-48 sm:flex-1 sm:max-w-xs">
           <span className="sr-only">Search todos</span>
           <Search aria-hidden="true" className="pointer-events-none absolute start-3 top-1/2 size-4 -translate-y-1/2 text-brand-ink" />
           <input
@@ -139,7 +139,7 @@ export function BacklogToolbar({
             <button
               type="button"
               aria-label={activeFilterCount ? `Filters, ${activeFilterCount} active` : 'Filters'}
-              className={`inline-flex h-9 items-center gap-2 rounded-sm border px-3 text-small font-medium transition-colors ${
+              className={`inline-flex h-9 items-center justify-center gap-2 rounded-sm border px-2 text-small font-medium transition-colors sm:px-3 ${
                 activeFilterCount
                   ? 'border-brand-soft-line bg-brand-soft text-brand-ink'
                   : 'border-line-strong bg-surface text-ink hover:bg-sunken'
@@ -285,12 +285,13 @@ export function BacklogToolbar({
 
       </div>
 
-      <div className="flex min-w-0 flex-wrap items-center gap-2 xl:justify-end">
+      <div className="grid min-w-0 grid-cols-2 items-center gap-2 xl:flex xl:flex-wrap xl:justify-end">
         <DropdownMenu.Root>
           <DropdownMenu.Trigger asChild>
             <Button
               size="sm"
               variant="secondary"
+              className="w-full xl:w-auto"
               leadingIcon={<Download aria-hidden="true" className="size-3.5 text-brand-ink" />}
             >
               Export
@@ -317,6 +318,7 @@ export function BacklogToolbar({
           <Button
             size="sm"
             variant="secondary"
+            className="w-full xl:w-auto"
             onClick={onOpenSprintTemplate}
             leadingIcon={<Settings2 aria-hidden="true" className="size-3.5 text-brand-ink" />}
           >
@@ -330,6 +332,7 @@ export function BacklogToolbar({
               <Button
                 size="sm"
                 variant="secondary"
+                className="w-full xl:w-auto"
                 leadingIcon={<Bot aria-hidden="true" className="size-3.5 text-brand-ink" />}
               >
                 AI actions
@@ -357,7 +360,7 @@ export function BacklogToolbar({
           </DropdownMenu.Portal>
         </DropdownMenu.Root>
 
-        <Button size="sm" variant="primary" leadingIcon={<Plus aria-hidden="true" className="size-4" />} onClick={onCreateSprint}>
+        <Button size="sm" variant="primary" className="col-span-2 w-full xl:col-span-1 xl:w-auto" leadingIcon={<Plus aria-hidden="true" className="size-4" />} onClick={onCreateSprint}>
           Create sprint
         </Button>
       </div>

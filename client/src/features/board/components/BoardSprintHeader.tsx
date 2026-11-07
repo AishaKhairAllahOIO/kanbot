@@ -24,7 +24,7 @@ export function BoardSprintHeader({
   const timeRemaining = getSprintTimeRemaining(sprint.endDate)
 
   return (
-    <header className="flex flex-wrap items-start justify-between gap-3">
+    <header className="flex flex-col items-stretch justify-between gap-3 sm:flex-row sm:items-start">
       <div className="grid gap-2">
         <div className="flex flex-wrap items-baseline gap-2">
           <h2 className="font-heading text-heading font-semibold text-ink">{sprint.name}</h2>
@@ -37,14 +37,14 @@ export function BoardSprintHeader({
         </div>
         {sprint.goal && <p className="text-small text-muted">Goal: {sprint.goal}</p>}
       </div>
-      <div className="flex shrink-0 flex-wrap items-center gap-2">
+      <div className="grid w-full grid-cols-2 gap-2 sm:flex sm:w-auto sm:shrink-0 sm:items-center">
         <Tooltip content="Summarize the active sprint">
           <Button
             size="md"
             variant="secondary"
             aria-label="Summarize sprint"
             leadingIcon={<Bot aria-hidden="true" className="size-4 text-brand-ink" />}
-            className="group w-40"
+            className="group w-full sm:w-40"
             onClick={onSummarize}
           >
             Summary
@@ -55,7 +55,7 @@ export function BoardSprintHeader({
             size="md"
             variant={showBurndown ? 'primary' : 'secondary'}
             leadingIcon={<TrendingDown aria-hidden="true" className={`size-4 ${showBurndown ? 'text-on-brand' : 'text-brand-ink'}`} />}
-            className="w-40"
+            className="w-full sm:w-40"
             onClick={onToggleBurndown}
             onPointerEnter={onPrefetchBurndown}
             onFocus={onPrefetchBurndown}
@@ -63,7 +63,7 @@ export function BoardSprintHeader({
             {showBurndown ? 'Hide burndown' : 'Burndown chart'}
           </Button>
         )}
-        <Button size="md" variant="primary" className="w-40" onClick={onComplete}>
+        <Button size="md" variant="primary" className="col-span-2 w-full sm:col-span-1 sm:w-40" onClick={onComplete}>
           Complete sprint
         </Button>
       </div>

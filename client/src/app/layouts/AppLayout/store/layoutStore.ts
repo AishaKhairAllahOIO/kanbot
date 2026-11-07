@@ -14,6 +14,7 @@ interface LayoutState {
   isSidebarCollapsed: boolean
   isAllProjectsOpen: boolean
   isCurrentProjectOpen: boolean
+  isStarredProjectsOpen: boolean
   isPaletteOpen: boolean
   isShortcutsOpen: boolean
   aiPlanningTab: AiPlanningTab | null
@@ -22,6 +23,7 @@ interface LayoutState {
   toggleSidebar: () => void
   toggleAllProjects: () => void
   toggleCurrentProject: () => void
+  toggleStarredProjects: () => void
   setPaletteOpen: (open: boolean) => void
   setShortcutsOpen: (open: boolean) => void
   setAiPlanningTab: (tab: AiPlanningTab | null) => void
@@ -41,7 +43,8 @@ export const useLayoutStore = create<LayoutState>()(
     (set) => ({
       isSidebarCollapsed: false,
       isAllProjectsOpen: false,
-      isCurrentProjectOpen: true,
+      isCurrentProjectOpen: false,
+      isStarredProjectsOpen: false,
       isPaletteOpen: false,
       isShortcutsOpen: false,
       aiPlanningTab: null,
@@ -50,6 +53,7 @@ export const useLayoutStore = create<LayoutState>()(
       toggleSidebar: () => set((state) => ({ isSidebarCollapsed: !state.isSidebarCollapsed })),
       toggleAllProjects: () => set((state) => ({ isAllProjectsOpen: !state.isAllProjectsOpen })),
       toggleCurrentProject: () => set((state) => ({ isCurrentProjectOpen: !state.isCurrentProjectOpen })),
+      toggleStarredProjects: () => set((state) => ({ isStarredProjectsOpen: !state.isStarredProjectsOpen })),
       setPaletteOpen: (isPaletteOpen) => set({ isPaletteOpen }),
       setShortcutsOpen: (isShortcutsOpen) => set({ isShortcutsOpen }),
       setAiPlanningTab: (aiPlanningTab) => set({ aiPlanningTab }),
@@ -68,11 +72,24 @@ export const useLayoutStore = create<LayoutState>()(
     }),
     {
       name: 'kanbot:layout',
+      version: 1,
+      migrate: (persistedState, version) => {
+        if (version < 1 && typeof persistedState === 'object' && persistedState !== null) {
+          return {
+            ...persistedState,
+            isAllProjectsOpen: false,
+            isCurrentProjectOpen: false,
+            isStarredProjectsOpen: false,
+          }
+        }
+        return persistedState as Partial<LayoutState>
+      },
       storage: createJSONStorage(() => localStorage),
       partialize: (state) => ({
         isSidebarCollapsed: state.isSidebarCollapsed,
         isAllProjectsOpen: state.isAllProjectsOpen,
         isCurrentProjectOpen: state.isCurrentProjectOpen,
+        isStarredProjectsOpen: state.isStarredProjectsOpen,
       }),
     },
   ),

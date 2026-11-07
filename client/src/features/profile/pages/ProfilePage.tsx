@@ -82,19 +82,7 @@ export function ProfilePage() {
     <>
       <Topbar title="Profile" />
       <main className="page-gutter mx-auto grid w-full max-w-4xl gap-6 py-6 pb-10">
-        <header className="grid gap-1 border-b border-line pb-5">
-          <div className="flex items-center gap-2 text-caption font-semibold uppercase tracking-wide text-brand-ink">
-            <UserRound aria-hidden="true" className="size-4" />
-            Account settings
-          </div>
-          <h1 className="font-heading text-title font-semibold tracking-tight text-ink">
-            Your profile
-          </h1>
-          <p className="max-w-2xl text-body text-muted">
-            Manage how you appear in Kanbot and personalize your workspace.
-          </p>
-        </header>
-
+   
         <section
           aria-labelledby="profile-identity-heading"
           className="theme-card relative isolate overflow-hidden rounded-lg border border-line"

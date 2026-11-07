@@ -36,11 +36,25 @@ export function TodoCard({
     useSortable({
       id: todo.id,
     })
-  const { onTouchStart, ...handleListeners } = listeners ?? {}
+  const {
+    onTouchStart,
+    onMouseDown,
+    onPointerDown,
+    ...handleListeners
+  } = listeners ?? {}
+  const canStartDragFrom = (target: EventTarget | null) =>
+    !(
+      target instanceof Element &&
+      target.closest(
+        'button:not([data-card-drag-source]), a, input, select, textarea, [role="menuitem"]',
+      )
+    )
   const handleCardTouchStart: TouchEventHandler<HTMLElement> | undefined =
     onTouchStart
       ? (event) => {
-          if (enableCardTouchDrag) onTouchStart(event)
+          if (enableCardTouchDrag && canStartDragFrom(event.target)) {
+            onTouchStart(event)
+          }
         }
       : undefined
   const handleTouchHandleStart:
@@ -64,6 +78,12 @@ export function TodoCard({
         onOpen(todo.id)
       }}
       onTouchStart={handleCardTouchStart}
+      onMouseDown={(event) => {
+        if (canStartDragFrom(event.target)) onMouseDown?.(event)
+      }}
+      onPointerDown={(event) => {
+        if (canStartDragFrom(event.target)) onPointerDown?.(event)
+      }}
       data-dragging={isDragging || undefined}
       data-done-flash={isDoneFlash || undefined}
       style={{
@@ -157,6 +177,7 @@ export function TodoCard({
               {...attributes}
               {...handleListeners}
               onTouchStart={handleTouchHandleStart}
+              data-card-drag-source
               className="cursor-grab rounded-xs p-1 text-muted hover:bg-sunken active:cursor-grabbing"
             >
               <GripVertical aria-hidden="true" className="size-4" />

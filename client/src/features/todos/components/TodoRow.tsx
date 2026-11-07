@@ -115,6 +115,19 @@ export function TodoRow({
     data: { listId, itemIds, todoKey: todo.key, todo },
     disabled: !canReorder,
   });
+  const {
+    onMouseDown,
+    onPointerDown,
+    onTouchStart,
+    ...handleListeners
+  } = listeners ?? {};
+  const canStartDragFrom = (target: EventTarget | null) =>
+    !(
+      target instanceof Element &&
+      target.closest(
+        'button:not([data-todo-drag-source]), input, select, textarea, [role="menuitem"]',
+      )
+    );
   const style = {
     transform: CSS.Transform.toString(transform),
     transition: `${transition ?? "transform 200ms var(--ease)"}, background-color 350ms var(--ease), box-shadow 350ms var(--ease)`,
@@ -139,6 +152,15 @@ export function TodoRow({
       ref={setNodeRef}
       data-todo-id={todo.id}
       style={style}
+      onMouseDown={(event) => {
+        if (canStartDragFrom(event.target)) onMouseDown?.(event);
+      }}
+      onPointerDown={(event) => {
+        if (canStartDragFrom(event.target)) onPointerDown?.(event);
+      }}
+      onTouchStart={(event) => {
+        if (canStartDragFrom(event.target)) onTouchStart?.(event);
+      }}
       onClick={() => onOpen(todo.id)}
       className={`group flex min-h-11 w-full min-w-0 cursor-pointer items-center gap-2 px-2 text-body transition-colors ${
         isNewlyAdded
@@ -176,7 +198,7 @@ export function TodoRow({
         }
         disabled={!canReorder}
         {...attributes}
-        {...listeners}
+        {...handleListeners}
         onKeyDown={(event) => {
           listeners?.onKeyDown?.(event);
           if (
@@ -193,7 +215,8 @@ export function TodoRow({
           }
         }}
         onClick={(event) => event.stopPropagation()}
-        className="grid size-13 shrink-0 place-content-center rounded-sm text-subtle hover:bg-brand-soft/40 hover:text-ink disabled:cursor-not-allowed disabled:opacity-40 sm:size-6"
+        data-todo-drag-source
+        className="touch-none grid size-13 shrink-0 place-content-center rounded-sm text-subtle hover:bg-brand-soft/40 hover:text-ink disabled:cursor-not-allowed disabled:opacity-40 sm:size-6"
       >
         <GripVertical aria-hidden="true" className="size-4" />
       </button>
@@ -206,6 +229,7 @@ export function TodoRow({
           event.stopPropagation();
           onOpen(todo.id);
         }}
+        data-todo-drag-source
         className="min-w-0 flex-1 truncate text-left font-medium text-ink"
         title={todo.title}
       >
