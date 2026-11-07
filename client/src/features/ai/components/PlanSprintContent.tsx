@@ -17,7 +17,7 @@ import { AiErrorState } from './AiErrorState'
 interface PlanSprintContentProps {
   projectId: string
   onClose: () => void
-  onViewBacklog: () => void
+  onViewBacklog: (sprintId: string) => void
 }
 
 interface ScrollEdges {
@@ -151,7 +151,7 @@ export function PlanSprintContent({ projectId, onClose, onViewBacklog }: PlanSpr
         </div>
         <div className="flex flex-wrap justify-center gap-2">
           <Button onClick={onClose}>Close</Button>
-          <Button variant="primary" onClick={onViewBacklog}>View in Backlog</Button>
+          <Button variant="primary" onClick={() => onViewBacklog(createdSprint.id)}>View in Backlog</Button>
         </div>
       </div>
     )

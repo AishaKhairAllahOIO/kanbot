@@ -18,10 +18,12 @@ import { SprintFormDialog } from '@/features/sprints/components/SprintFormDialog
 import { StartSprintDialog } from '@/features/sprints/components/StartSprintDialog'
 import { CollapsibleSectionHeader } from './CollapsibleSectionHeader'
 import { useUiPreferencesStore } from '@/app/stores/uiPreferencesStore'
+import { scrollBacklogSectionIntoView } from '@/features/backlog/utils/scrollBacklogSection'
 
 interface PlannedSprintSectionProps {
   projectId: string
   sprint: Sprint
+  isHighlighted?: boolean
   sprints: Sprint[]
   activeSprint: Sprint | null
   onOpenTodo: (todoId: string) => void
@@ -34,6 +36,7 @@ interface PlannedSprintSectionProps {
 export function PlannedSprintSection({
   projectId,
   sprint,
+  isHighlighted = false,
   sprints,
   activeSprint,
   onOpenTodo,
@@ -94,6 +97,17 @@ export function PlannedSprintSection({
     }
   }, [expanded, todos.length, updateScrollCue])
 
+  useEffect(() => {
+    if (!isHighlighted) return
+
+    const frame = window.requestAnimationFrame(() => {
+      const section = document.getElementById(`backlog-sprint-${sprint.id}`)
+      if (section) scrollBacklogSectionIntoView(section)
+    })
+
+    return () => window.cancelAnimationFrame(frame)
+  }, [isHighlighted, sprint.id])
+
   async function deleteSprint() {
     setDeleteError('')
     try {
@@ -115,8 +129,9 @@ export function PlannedSprintSection({
 
   return (
     <section
+      id={`backlog-sprint-${sprint.id}`}
       ref={setNodeRef}
-      className={`theme-card mb-4 overflow-hidden rounded-md border-s-2 border-s-info ${isOver ? 'bg-sunken/50 outline outline-1 outline-line-strong outline-offset-1' : ''}`}
+      className={`theme-card mb-4 scroll-mt-20 overflow-hidden rounded-md border-s-2 border-s-info transition-shadow ${isHighlighted ? 'ring-2 ring-inset ring-info' : ''} ${isOver ? 'bg-sunken/50 outline outline-1 outline-line-strong outline-offset-1' : ''}`}
     >
       <CollapsibleSectionHeader
         variant="sprint"

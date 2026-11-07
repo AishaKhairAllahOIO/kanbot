@@ -32,7 +32,7 @@ interface AiPlanningPanelProps {
   onOpenChange: (open: boolean) => void
   onPromptSent: (id: number) => void
   onOpenTodo: (todoId: string) => void
-  onViewBacklog: (todoIds?: string[]) => void
+  onViewBacklog: (todoIds?: string[], sprintId?: string) => void
   onViewSprint: (sprintId: string) => void
 }
 
@@ -220,7 +220,7 @@ export function AiPlanningPanel({
               <PlanSprintContent
                 projectId={projectId}
                 onClose={() => onOpenChange(false)}
-                onViewBacklog={() => onViewBacklog()}
+                onViewBacklog={(sprintId) => onViewBacklog(undefined, sprintId)}
               />
             )}
           </div>

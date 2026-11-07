@@ -90,11 +90,13 @@ export function AppOverlays() {
     setAiPlanningTab("plan");
   }, [setAiPlanningTab]);
   const viewBacklog = useCallback(
-    (todoIds?: string[]) => {
+    (todoIds?: string[], sprintId?: string) => {
       setAiPlanningTab(null);
       if (projectId) {
         navigate(`/projects/${projectId}/backlog`, {
-          state: todoIds ? { highlightTodoIds: todoIds } : null,
+          state: todoIds || sprintId
+            ? { highlightTodoIds: todoIds, highlightSprintId: sprintId }
+            : null,
         });
       }
     },

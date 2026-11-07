@@ -9,6 +9,7 @@ import { QuickCreateTodo } from '@/features/todos/components/QuickCreateTodo'
 import { SortableTodoList } from '@/features/todos/components/SortableTodoList'
 import { CollapsibleSectionHeader } from './CollapsibleSectionHeader'
 import { useUiPreferencesStore } from '@/app/stores/uiPreferencesStore'
+import { scrollBacklogSectionIntoView } from '@/features/backlog/utils/scrollBacklogSection'
 
 interface BacklogTodoSectionProps {
   highlightedTodoIds?: ReadonlySet<string>
@@ -104,6 +105,9 @@ export function BacklogTodoSection({
     ).filter((row) => highlightedTodoIds.has(row.dataset.todoId ?? ''))
     if (addedRows.length === 0) return
 
+    const section = document.getElementById('backlog-todos-section')
+    if (section) scrollBacklogSectionIntoView(section)
+
     const containerRect = container.getBoundingClientRect()
     const firstRowRect = addedRows[0].getBoundingClientRect()
     const lastRowRect = addedRows[addedRows.length - 1].getBoundingClientRect()
@@ -135,7 +139,7 @@ export function BacklogTodoSection({
     <section
       id="backlog-todos-section"
       ref={setNodeRef}
-      className={`theme-card mt-5 overflow-hidden rounded-md border-s-2 border-s-brand ${isOver ? 'bg-sunken/50 outline outline-1 outline-line-strong outline-offset-1' : ''}`}
+      className={`theme-card mt-5 scroll-mt-20 overflow-hidden rounded-md border-s-2 border-s-brand ${isOver ? 'bg-sunken/50 outline outline-1 outline-line-strong outline-offset-1' : ''}`}
     >
       <CollapsibleSectionHeader
         variant="backlog"

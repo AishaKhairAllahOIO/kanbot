@@ -23,6 +23,7 @@ import { Skeleton } from "@/shared/components/Skeleton";
 import { useDebouncedValue } from "@/shared/hooks/useDebouncedValue";
 import { useDocumentTitle } from "@/shared/hooks/useDocumentTitle";
 import { useLayoutStore } from "@/app/layouts/AppLayout/store/layoutStore";
+import { useUiPreferencesStore } from "@/app/stores/uiPreferencesStore";
 import { useTodos } from "@/features/todos/hooks/useTodos";
 import { useRemoveTodo, useMoveTodo } from "@/features/todos/hooks";
 import { useSprints } from "@/features/sprints/hooks/useSprints";
@@ -67,9 +68,11 @@ export function BacklogPage() {
   const navigate = useNavigate();
   const stateHighlightTimeout = useRef<number | null>(null);
   const setAiPlanningTab = useLayoutStore((state) => state.setAiPlanningTab);
+  const setSectionCollapsed = useUiPreferencesStore((state) => state.setCollapsed);
   const [newlyAddedTodoIds, setNewlyAddedTodoIds] = useState<Set<string>>(
     () => new Set(),
   );
+  const [highlightedSprintId, setHighlightedSprintId] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [priority, setPriority] = useState<TodoPriority | "">("");
   const [type, setType] = useState<TodoType | "">("");
@@ -92,6 +95,7 @@ export function BacklogPage() {
         return;
       }
 
+      setSectionCollapsed(`backlog:${projectId}:todos`, false);
       setNewlyAddedTodoIds(new Set(todoIds));
       window.clearTimeout(highlightTimeout);
       highlightTimeout = window.setTimeout(
@@ -105,22 +109,43 @@ export function BacklogPage() {
       window.removeEventListener("kanbot:backlog-todos-added", handleBacklogTodosAdded);
       window.clearTimeout(highlightTimeout);
     };
-  }, []);
+  }, [projectId, setSectionCollapsed]);
 
   useEffect(() => {
-    const state = location.state as { highlightTodoIds?: unknown } | null;
+    const state = location.state as {
+      highlightTodoIds?: unknown;
+      highlightSprintId?: unknown;
+    } | null;
     const todoIds = state?.highlightTodoIds;
-    if (!Array.isArray(todoIds) || !todoIds.every((id) => typeof id === "string")) {
+    const validTodoIds =
+      Array.isArray(todoIds) && todoIds.every((id) => typeof id === "string")
+        ? todoIds
+        : null;
+    const sprintId =
+      typeof state?.highlightSprintId === "string"
+        ? state.highlightSprintId
+        : null;
+    if (!validTodoIds?.length && !sprintId) {
       return;
     }
 
+    if (validTodoIds?.length) {
+      setSectionCollapsed(`backlog:${projectId}:todos`, false);
+    }
+    if (sprintId) {
+      setSectionCollapsed(`backlog:sprint:${sprintId}`, false);
+    }
     if (stateHighlightTimeout.current !== null) {
       window.clearTimeout(stateHighlightTimeout.current);
     }
     window.requestAnimationFrame(() => {
-      setNewlyAddedTodoIds(new Set(todoIds));
+      setNewlyAddedTodoIds(new Set(validTodoIds ?? []));
+      setHighlightedSprintId(sprintId);
       stateHighlightTimeout.current = window.setTimeout(
-        () => setNewlyAddedTodoIds(new Set()),
+        () => {
+          setNewlyAddedTodoIds(new Set());
+          setHighlightedSprintId(null);
+        },
         3200,
       );
     });
@@ -128,7 +153,7 @@ export function BacklogPage() {
       replace: true,
       state: null,
     });
-  }, [location.hash, location.key, location.pathname, location.search, location.state, navigate]);
+  }, [location.hash, location.key, location.pathname, location.search, location.state, navigate, projectId, setSectionCollapsed]);
 
   useEffect(() => () => {
     if (stateHighlightTimeout.current !== null) {
@@ -378,6 +403,7 @@ export function BacklogPage() {
               key={sprint.id}
               projectId={projectId}
               sprint={sprint}
+              isHighlighted={highlightedSprintId === sprint.id}
               sprints={sprints}
               activeSprint={activeSprint}
               onOpenTodo={setSelectedTodoId}

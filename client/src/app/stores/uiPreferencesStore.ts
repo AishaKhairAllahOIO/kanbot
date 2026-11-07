@@ -4,6 +4,7 @@ import { createJSONStorage, persist } from 'zustand/middleware'
 interface UiPreferencesState {
   collapsedSections: Record<string, boolean>
   toggleCollapsed: (key: string, defaultCollapsed?: boolean) => void
+  setCollapsed: (key: string, collapsed: boolean) => void
 }
 
 export const useUiPreferencesStore = create<UiPreferencesState>()(
@@ -15,6 +16,13 @@ export const useUiPreferencesStore = create<UiPreferencesState>()(
           collapsedSections: {
             ...state.collapsedSections,
             [key]: !(state.collapsedSections[key] ?? defaultCollapsed),
+          },
+        })),
+      setCollapsed: (key, collapsed) =>
+        set((state) => ({
+          collapsedSections: {
+            ...state.collapsedSections,
+            [key]: collapsed,
           },
         })),
     }),
