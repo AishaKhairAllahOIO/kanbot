@@ -1,6 +1,6 @@
 import { Lock } from "lucide-react";
 import { NavLink, useParams } from "react-router";
-import { StarredProjectsMenu } from "../desktop/sidebar/components/StarredProjectsMenu";
+import { StarredProjectsMenu } from "../sidebar/components/StarredProjectsMenu";
 import {
   PROJECTS_NAV_ITEM,
   useProjectNavItems,

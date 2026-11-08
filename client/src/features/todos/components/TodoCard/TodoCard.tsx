@@ -2,9 +2,10 @@ import type { TouchEventHandler } from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
-import { Bot, GripVertical, MoreHorizontal, Trash2 } from 'lucide-react'
+import { Bot, GripVertical, MoreHorizontal, Timer, Trash2 } from 'lucide-react'
 import type { Todo, TodoStatus } from '@/shared/types/api'
-import { useLayoutStore } from '@/app/layouts/AppLayout/store/layoutStore'
+import { useLayoutStore } from '@/app/layouts/AppLayout/shared/store/layoutStore'
+import { useFocusTimer } from '@/app/layouts/AppLayout/focus/state/FocusTimerContext'
 import { buildTodoEstimatePrompt } from '@/features/ai/utils/todoPrompts'
 import { statusNames } from '@/features/todos/config/statusConfig'
 import { CardBody } from './CardBody'
@@ -29,6 +30,7 @@ export function TodoCard({
   enableCardTouchDrag,
   isDoneFlash = false,
 }: TodoCardProps) {
+  const { startTask } = useFocusTimer()
   const requestAssistantPrompt = useLayoutStore(
     (state) => state.requestAssistantPrompt,
   )
@@ -96,6 +98,20 @@ export function TodoCard({
         todo={todo}
         actions={
           <div className="flex shrink-0 items-center gap-0.5 opacity-0 transition-opacity duration-fast group-hover:opacity-100 group-focus-within:opacity-100 [@media(hover:none)]:opacity-100">
+            {todo.status !== 'done' && (
+              <button
+                type="button"
+                aria-label={`Start focus on ${todo.key}`}
+                title={`Start focus on ${todo.key}`}
+                onClick={(event) => {
+                  event.stopPropagation()
+                  startTask(todo)
+                }}
+                className="rounded-xs p-1 text-muted hover:bg-brand-soft hover:text-brand-ink"
+              >
+                <Timer aria-hidden="true" className="size-4" />
+              </button>
+            )}
             <DropdownMenu.Root>
               <DropdownMenu.Trigger asChild>
                 <button

@@ -1,13 +1,12 @@
 import { useId } from "react";
 import { Star } from "lucide-react";
 import { NavLink } from "react-router";
-import { useCurrentProject } from "../../../shared/hooks/useCurrentProject";
+import { useCurrentProject } from "../../shared/hooks/useCurrentProject";
 import { useStarredProjects } from "../hooks/useStarredProjects";
-import { prefetchRoute } from "../../../../../providers/router/routeModules";
+import { prefetchRoute } from "../../../../providers/router/routeModules";
 import { CollapseButton } from "./CollapseButton";
-import { useLayoutStore } from "../../../store/layoutStore";
+import { useLayoutStore } from "../../shared/store/layoutStore";
 
-/** Starred projects for quick switching. */
 export function StarredProjects() {
   const headingId = useId();
   const listId = useId();

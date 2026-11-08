@@ -1,12 +1,12 @@
 import { useId } from "react";
 import { FolderKanban, Star } from "lucide-react";
 import { useParams } from "react-router";
-import { useCurrentProject } from "../../../shared/hooks/useCurrentProject";
-import { useProjectNavItems } from "../../../shared/hooks/useProjectNavItems";
+import { useCurrentProject } from "../../shared/hooks/useCurrentProject";
+import { useProjectNavItems } from "../../shared/hooks/useProjectNavItems";
 import { useStarredProjects } from "../hooks/useStarredProjects";
 import { CollapseButton } from "./CollapseButton";
 import { SidebarNavItem } from "./SidebarNavItem";
-import { useLayoutStore } from "../../../store/layoutStore";
+import { useLayoutStore } from "../../shared/store/layoutStore";
 
 export function CurrentProject() {
   const headingId = useId();

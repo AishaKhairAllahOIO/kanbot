@@ -1,7 +1,4 @@
-/**
- * Copies text with the Clipboard API and falls back to a temporary textarea
- * when the API is unavailable (older browsers or insecure contexts).
- */
+
 export async function copyText(text: string): Promise<boolean> {
   if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
     try {

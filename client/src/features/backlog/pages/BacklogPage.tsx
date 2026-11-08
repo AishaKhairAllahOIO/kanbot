@@ -23,7 +23,7 @@ import { Modal } from "@/shared/components/Modal";
 import { Skeleton } from "@/shared/components/Skeleton";
 import { useDebouncedValue } from "@/shared/hooks/useDebouncedValue";
 import { useDocumentTitle } from "@/shared/hooks/useDocumentTitle";
-import { useLayoutStore } from "@/app/layouts/AppLayout/store/layoutStore";
+import { useLayoutStore } from "@/app/layouts/AppLayout/shared/store/layoutStore";
 import { useUiPreferencesStore } from "@/app/stores/uiPreferencesStore";
 import { useTodos } from "@/features/todos/hooks/useTodos";
 import { useRemoveTodo, useMoveTodo } from "@/features/todos/hooks";

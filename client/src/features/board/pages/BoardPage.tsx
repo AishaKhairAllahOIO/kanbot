@@ -42,7 +42,7 @@ import { statusNames } from "@/features/todos/config/statusConfig";
 import { useTodoMutations } from "@/features/todos/hooks/useTodos";
 import { useDocumentTitle } from "@/shared/hooks/useDocumentTitle";
 import { Topbar } from "@/app/layouts";
-import { useLayoutStore } from "@/app/layouts/AppLayout/store/layoutStore";
+import { useLayoutStore } from "@/app/layouts/AppLayout/shared/store/layoutStore";
 
 const loadBurndownChart = () =>
   import("../components/BurndownChart").then((module) => ({

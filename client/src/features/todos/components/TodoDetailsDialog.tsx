@@ -26,7 +26,7 @@ import { Spinner } from "@/shared/components/Spinner";
 import { useTodo, useTodoMutations } from "@/features/todos/hooks/useTodos";
 import { useSprints } from "@/features/sprints/hooks/useSprints";
 import { LabelBadge } from "@/features/todos/components/labels";
-import { useLayoutStore } from "@/app/layouts/AppLayout/store/layoutStore";
+import { useLayoutStore } from "@/app/layouts/AppLayout/shared/store/layoutStore";
 import {
   buildTodoEstimatePrompt,
   buildTodoImprovementPrompt,

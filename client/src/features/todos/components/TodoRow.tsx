@@ -17,7 +17,7 @@ import {
   TypeBadge,
 } from "@/features/todos/components/badges";
 import { LabelBadge } from "@/features/todos/components/labels";
-import { useLayoutStore } from "@/app/layouts/AppLayout/store/layoutStore";
+import { useLayoutStore } from "@/app/layouts/AppLayout/shared/store/layoutStore";
 import { buildTodoEstimatePrompt } from "@/features/ai/utils/todoPrompts";
 
 interface TodoRowProps {

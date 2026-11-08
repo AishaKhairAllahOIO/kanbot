@@ -5,10 +5,10 @@ import { Link, NavLink, useParams } from "react-router";
 import { paths } from "@/shared/config/paths";
 import { useStarredProjects } from "../hooks/useStarredProjects";
 import { useProjectActions } from "@/features/projects/hooks/useProjectActions";
-import { useCurrentProject } from "../../../shared/hooks/useCurrentProject";
+import { useCurrentProject } from "../../shared/hooks/useCurrentProject";
 import { CollapseButton } from "./CollapseButton";
-import { prefetchRoute } from "../../../../../providers/router/routeModules";
-import { useLayoutStore } from "../../../store/layoutStore";
+import { prefetchRoute } from "../../../../providers/router/routeModules";
+import { useLayoutStore } from "../../shared/store/layoutStore";
 import { ProjectReminderToggle } from "@/features/notifications/components/ProjectReminderToggle";
 
 export function AllProjects() {

@@ -511,8 +511,9 @@
   }
 
   .toast-stack {
-    right: calc(env(safe-area-inset-right) + var(--spacing) * 4);
     bottom: calc(var(--bottom-nav-height) + env(safe-area-inset-bottom) + var(--spacing) * 4);
+    left: 50%;
+    transform: translateX(-50%);
     width: min(
       var(--container-toast),
       calc(100vw - env(safe-area-inset-left) - env(safe-area-inset-right) - var(--spacing) * 8)

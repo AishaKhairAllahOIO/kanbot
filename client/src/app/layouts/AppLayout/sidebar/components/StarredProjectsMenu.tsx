@@ -2,9 +2,9 @@ import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import { Star } from 'lucide-react'
 import { Link } from 'react-router'
 import { Tooltip } from '@/shared/components/Tooltip'
-import { useCurrentProject } from '../../../shared/hooks/useCurrentProject'
+import { useCurrentProject } from '../../shared/hooks/useCurrentProject'
 import { useStarredProjects } from '../hooks/useStarredProjects'
-import { prefetchRoute } from '../../../../../providers/router/routeModules'
+import { prefetchRoute } from '../../../../providers/router/routeModules'
 
 interface StarredProjectsMenuProps {
   className: string

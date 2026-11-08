@@ -3,9 +3,7 @@ import { ChevronDown } from 'lucide-react'
 interface CollapseButtonProps {
   open: boolean
   onToggle: () => void
-  /** id of the region this button shows or hides. */
   controls: string
-  /** Accessible name of the region, e.g. "project list". */
   label: string
 }
 

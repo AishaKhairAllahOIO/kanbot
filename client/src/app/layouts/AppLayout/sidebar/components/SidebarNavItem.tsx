@@ -1,7 +1,7 @@
 import { Lock } from "lucide-react";
 import { NavLink } from "react-router";
-import type { NavigationItem } from "../../../shared/types/navigation-item";
-import { prefetchRoute } from "../../../../../providers/router/routeModules";
+import type { NavigationItem } from "../../shared/types/navigation-item";
+import { prefetchRoute } from "../../../../providers/router/routeModules";
 
 const BASE =
   "flex min-h-10 items-center gap-3 rounded-sm px-3 text-body font-medium transition-colors";

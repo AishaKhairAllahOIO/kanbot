@@ -13,7 +13,6 @@ export function ProjectsWelcome() {
   const [active, setActive] = useState(0)
 
   useEffect(() => {
-    // إذا المستخدم مفعّل "تقليل الحركة" منوقف الأنيميشن
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
 
     const id = setInterval(() => {

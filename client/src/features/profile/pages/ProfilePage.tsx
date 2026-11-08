@@ -11,7 +11,7 @@ import { Button } from "@/shared/components/Button";
 import { EmptyState } from "@/shared/components/EmptyState";
 import { Modal } from "@/shared/components/Modal";
 import { getErrorMessage } from "@/shared/api/errors";
-import { Topbar } from "@/app/layouts/AppLayout/shared/topbar/Topbar";
+import { Topbar } from "@/app/layouts/AppLayout/topbar/Topbar";
 import { ProfileStatusPicker } from "../components/ProfileStatusPicker";
 import { useProfilePhoto } from "../hooks/useProfilePhoto";
 import { useMe } from "@/features/auth/hooks/useMe";

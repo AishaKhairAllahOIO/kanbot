@@ -98,13 +98,11 @@
   --success: #4ade80;
   --info: #38bdf8;
 
-  /* ===== Dark (داخل :root[data-theme='dark']) ===== */
 
 /* Status */
 --status-todo: #22d3ee;
 --status-in-progress: #60a5fa;
 --status-in-review: #c084fc;
-/* --status-done بتتبع --success تلقائياً */
 
 /* Priority */
 --priority-low: #2dd4bf;

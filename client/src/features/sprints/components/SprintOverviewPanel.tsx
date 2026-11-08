@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { ChevronDown, Download } from 'lucide-react'
 import * as DropdownMenu from '@radix-ui/react-dropdown-menu'
 import { SprintSummaryPanel } from '../../ai/components/SprintSummaryPanel'
@@ -12,18 +13,31 @@ import { TODO_STATUSES } from '../../../shared/types/api'
 import { statusBadge, statusDot, statusNames } from '../../todos/config/statusConfig'
 import { useSprintBoard } from '../hooks/useSprintBoard'
 import { getErrorMessage } from '../../../shared/api/errors'
+import { useFocusTimer } from '@/app/layouts/AppLayout/focus/state/FocusTimerContext'
 
 interface SprintOverviewPanelProps {
   sprint: Sprint
 }
 
 export function SprintOverviewPanel({ sprint }: SprintOverviewPanelProps) {
+  const [todosExpanded, setTodosExpanded] = useState(false)
   const boardQuery = useSprintBoard(sprint.id)
+  const { timer } = useFocusTimer()
   const stats = sprint.completedStats ?? sprint.stats
   const completionPercent = stats.totalTodos
     ? Math.round((stats.doneTodos / stats.totalTodos) * 100)
     : 0
   const carriedOver = sprint.completedStats?.carriedOver ?? 0
+  const focusSessions = sprint.status === 'completed'
+    ? timer.sessions.filter((session) => session.sprintId === sprint.id)
+    : []
+  const focusMinutes = focusSessions.reduce(
+    (total, session) => total + session.durationMinutes,
+    0,
+  )
+  const focusTime = focusMinutes >= 60
+    ? `${Math.floor(focusMinutes / 60)}h ${focusMinutes % 60}m`
+    : `${focusMinutes}m`
   const sprintTodoCount = boardQuery.data
     ? TODO_STATUSES.reduce((count, status) => count + boardQuery.data.columns[status].length, 0)
     : 0
@@ -76,7 +90,7 @@ export function SprintOverviewPanel({ sprint }: SprintOverviewPanelProps) {
         </DropdownMenu.Root>
       </header>
 
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-6">
         <SprintStatTile
           label="Completed todos"
           value={String(stats.doneTodos)}
@@ -97,62 +111,88 @@ export function SprintOverviewPanel({ sprint }: SprintOverviewPanelProps) {
           value={`${completionPercent}%`}
           tone={completionPercent >= 80 ? 'success' : completionPercent >= 50 ? 'warning' : 'danger'}
         />
+        <SprintStatTile
+          label="Focus sessions"
+          value={String(focusSessions.length)}
+          tone="info"
+        />
+        <SprintStatTile
+          label="Focus time"
+          value={focusTime}
+          tone="info"
+        />
       </div>
 
       <section className="theme-card grid content-start gap-3 p-4">
-        <header className="flex items-center justify-between gap-3">
-          <h3 className="font-heading text-heading font-semibold text-ink">Sprint todos</h3>
-          {boardQuery.data && (
-            <span className="text-caption text-muted">
-              {sprintTodoCount} {sprintTodoCount === 1 ? 'todo' : 'todos'}
-            </span>
-          )}
-        </header>
-        {boardQuery.isLoading ? (
-          <div className="flex justify-center py-4">
-            <Spinner label="Loading sprint todos" />
-          </div>
-        ) : boardQuery.isError ? (
-          <EmptyState
-            title="Sprint todos could not be loaded"
-            description={getErrorMessage(boardQuery.error)}
-            error
-            action={<Button onClick={() => void boardQuery.refetch()}>Try again</Button>}
-          />
-        ) : (
-          <div className="grid gap-3">
-            {TODO_STATUSES.map((status) => {
-              const todos = boardQuery.data?.columns[status] ?? []
-              if (!todos.length) return null
+        <button
+          type="button"
+          aria-expanded={todosExpanded}
+          aria-controls={`sprint-todos-${sprint.id}`}
+          onClick={() => setTodosExpanded((expanded) => !expanded)}
+          className="flex min-h-8 w-full items-center justify-between gap-3 text-start"
+        >
+          <span className="font-heading text-heading font-semibold text-ink">Sprint todos</span>
+          <span className="flex shrink-0 items-center gap-2">
+            {boardQuery.data && (
+              <span className="text-caption text-muted">
+                {sprintTodoCount} {sprintTodoCount === 1 ? 'todo' : 'todos'}
+              </span>
+            )}
+            <ChevronDown
+              aria-hidden="true"
+              className={`size-4 text-muted transition-transform ${todosExpanded ? 'rotate-180' : ''}`}
+            />
+          </span>
+        </button>
+        {todosExpanded && (
+          <div id={`sprint-todos-${sprint.id}`} className="grid gap-3">
+            {boardQuery.isLoading ? (
+              <div className="flex justify-center py-4">
+                <Spinner label="Loading sprint todos" />
+              </div>
+            ) : boardQuery.isError ? (
+              <EmptyState
+                title="Sprint todos could not be loaded"
+                description={getErrorMessage(boardQuery.error)}
+                error
+                action={<Button onClick={() => void boardQuery.refetch()}>Try again</Button>}
+              />
+            ) : (
+              <>
+                {TODO_STATUSES.map((status) => {
+                  const todos = boardQuery.data?.columns[status] ?? []
+                  if (!todos.length) return null
 
-              return (
-                <section key={status} aria-label={`${statusNames[status]} todos`}>
-                  <h4 className="mb-1.5 flex items-center gap-2 text-small font-semibold text-ink">
-                    <span aria-hidden="true" className={`size-2 rounded-full ${statusDot[status]}`} />
-                    {statusNames[status]}
-                    <span className={`rounded-full border px-1.5 py-0.5 text-caption font-medium tabular-nums ${statusBadge[status]}`}>
-                      {todos.length}
-                    </span>
-                  </h4>
-                  <ul className="divide-y divide-line rounded-sm border border-line">
-                    {todos.map((todo) => (
-                      <li
-                        key={todo.id}
-                        className="flex min-w-0 items-center gap-3 px-3 py-2 text-small"
-                      >
-                        <span className="shrink-0 font-mono text-key text-muted">{todo.key}</span>
-                        <span className="min-w-0 flex-1 truncate text-ink">{todo.title}</span>
-                        <span className="shrink-0 text-caption tabular-nums text-muted">
-                          {todo.storyPoints ?? 0} pts
+                  return (
+                    <section key={status} aria-label={`${statusNames[status]} todos`}>
+                      <h4 className="mb-1.5 flex items-center gap-2 text-small font-semibold text-ink">
+                        <span aria-hidden="true" className={`size-2 rounded-full ${statusDot[status]}`} />
+                        {statusNames[status]}
+                        <span className={`rounded-full border px-1.5 py-0.5 text-caption font-medium tabular-nums ${statusBadge[status]}`}>
+                          {todos.length}
                         </span>
-                      </li>
-                    ))}
-                  </ul>
-                </section>
-              )
-            })}
-            {sprintTodoCount === 0 && (
-              <p className="py-3 text-center text-small text-muted">No todos in this sprint yet.</p>
+                      </h4>
+                      <ul className="divide-y divide-line rounded-sm border border-line">
+                        {todos.map((todo) => (
+                          <li
+                            key={todo.id}
+                            className="flex min-w-0 items-center gap-3 px-3 py-2 text-small"
+                          >
+                            <span className="shrink-0 font-mono text-key text-muted">{todo.key}</span>
+                            <span className="min-w-0 flex-1 truncate text-ink">{todo.title}</span>
+                            <span className="shrink-0 text-caption tabular-nums text-muted">
+                              {todo.storyPoints ?? 0} pts
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </section>
+                  )
+                })}
+                {sprintTodoCount === 0 && (
+                  <p className="py-3 text-center text-small text-muted">No todos in this sprint yet.</p>
+                )}
+              </>
             )}
           </div>
         )}
