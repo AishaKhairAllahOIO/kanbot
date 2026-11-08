@@ -55,39 +55,6 @@ export function SprintOverviewPanel({ sprint }: SprintOverviewPanelProps) {
             {sprint.goal && <span className="ml-1">· Goal: {sprint.goal}</span>}
           </p>
         </div>
-        <DropdownMenu.Root>
-          <DropdownMenu.Trigger asChild>
-            <Button
-              size="sm"
-              variant="secondary"
-              className="group hover:text-brand-ink"
-              leadingIcon={<Download aria-hidden="true" className="size-3.5 text-brand-ink transition-transform duration-fast group-hover:scale-[1.06] motion-reduce:transition-none motion-reduce:group-hover:scale-100" />}
-            >
-              Export summary
-              <ChevronDown aria-hidden="true" className="ml-1 size-3 text-brand-ink transition-transform duration-fast group-hover:scale-[1.06] motion-reduce:transition-none motion-reduce:group-hover:scale-100" />
-            </Button>
-          </DropdownMenu.Trigger>
-          <DropdownMenu.Portal>
-            <DropdownMenu.Content
-              align="end"
-              sideOffset={4}
-              className="z-popover rounded-md border border-line bg-raised p-1 shadow-pop"
-            >
-              <DropdownMenu.Item
-                className="menu-item"
-                onSelect={() => exportSprintSummaryToMarkdown(sprint)}
-              >
-                Export as Markdown
-              </DropdownMenu.Item>
-              <DropdownMenu.Item
-                className="menu-item"
-                onSelect={() => exportSprintSummaryToCsv(sprint)}
-              >
-                Export as CSV
-              </DropdownMenu.Item>
-            </DropdownMenu.Content>
-          </DropdownMenu.Portal>
-        </DropdownMenu.Root>
       </header>
 
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 xl:grid-cols-6">
@@ -204,6 +171,41 @@ export function SprintOverviewPanel({ sprint }: SprintOverviewPanelProps) {
           summary={sprint.summary}
           disabled={sprint.status === 'planned'}
           className="min-h-[24rem]"
+          headerActions={
+            <DropdownMenu.Root>
+              <DropdownMenu.Trigger asChild>
+                <Button
+                  size="sm"
+                  variant="secondary"
+                  className="group hover:text-brand-ink"
+                  leadingIcon={<Download aria-hidden="true" className="size-3.5 text-brand-ink transition-transform duration-fast group-hover:scale-[1.06] motion-reduce:transition-none motion-reduce:group-hover:scale-100" />}
+                >
+                  Export summary
+                  <ChevronDown aria-hidden="true" className="ml-1 size-3 text-brand-ink transition-transform duration-fast group-hover:scale-[1.06] motion-reduce:transition-none motion-reduce:group-hover:scale-100" />
+                </Button>
+              </DropdownMenu.Trigger>
+              <DropdownMenu.Portal>
+                <DropdownMenu.Content
+                  align="end"
+                  sideOffset={4}
+                  className="z-popover rounded-md border border-line bg-raised p-1 shadow-pop"
+                >
+                  <DropdownMenu.Item
+                    className="menu-item"
+                    onSelect={() => exportSprintSummaryToMarkdown(sprint)}
+                  >
+                    Export as Markdown
+                  </DropdownMenu.Item>
+                  <DropdownMenu.Item
+                    className="menu-item"
+                    onSelect={() => exportSprintSummaryToCsv(sprint)}
+                  >
+                    Export as CSV
+                  </DropdownMenu.Item>
+                </DropdownMenu.Content>
+              </DropdownMenu.Portal>
+            </DropdownMenu.Root>
+          }
         />
       </div>
     </section>

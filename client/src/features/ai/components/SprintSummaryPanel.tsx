@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { Bot, RefreshCw, Sparkles } from 'lucide-react'
 import { getErrorMessage } from '../../../shared/api/errors'
 import { Button } from '../../../shared/components/Button'
@@ -12,6 +13,7 @@ interface SprintSummaryPanelProps {
   disabled?: boolean
   className?: string
   onViewSprint?: () => void
+  headerActions?: ReactNode
 }
 
 export function SprintSummaryPanel({
@@ -20,6 +22,7 @@ export function SprintSummaryPanel({
   disabled = false,
   className = '',
   onViewSprint,
+  headerActions,
 }: SprintSummaryPanelProps) {
   const summarizeSprint = useSummarizeSprint()
   const generatedSummary =
@@ -36,6 +39,7 @@ export function SprintSummaryPanel({
           <h3 className="font-heading text-heading font-semibold text-ink">AI Summary</h3>
         </div>
         <div className="flex flex-wrap items-center gap-2">
+          {headerActions}
           {content && onViewSprint && (
             <Button
               size="sm"
